@@ -1,4 +1,5 @@
 . "$(dirname "$0")/common.sh"
 yarn lint
 yarn test:relevant
+exit 1
 

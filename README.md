@@ -235,12 +235,6 @@ If you try to chat with a specific document when running in Azure environment, t
 
 This issue will be addressed in the upcoming updates and the status of this issue fix will be posted in the Issues section of the repo.
 
-### Issue [#85](https://github.com/microsoft/teams-copilot-starter/issues/85): Conversation history is shared with other users
-
-When multiple users are chatting with the bot at the same time, their conversation history may be shared and mixed up with the chat history from another user's conversation with the same instance of the bot.
-
-This issue will be addressed in the upcoming updates and the status of this issue fix will be posted in the Issues section of the repo.
-
 ___________________________________
 
 ><sup>1</sup> When chosing the value for the `OPENAI_MODEL` environment variable, make sure the Azure Open AI Model Deployment name with the same name exist in your Azure Open AI account. For OpenAI, the name must match one of the existing models, as per [OpenAI documentation](https://platform.openai.com/docs/models).
