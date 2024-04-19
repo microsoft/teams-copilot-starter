@@ -8,7 +8,7 @@ This project is built using the TeamsFx Toolkit, which provides a simple set of 
 
 ## Get Started
 
-**To get started, head over to the [Getting Started Guide](./GET_STARTED.md).**
+**To get started, head over to the [Getting Started Guide](./docs/get-started.md).**
 
 ## Teams Copilot Starter Capabilities
 
