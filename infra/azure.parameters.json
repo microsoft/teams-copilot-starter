@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "teamsFxEnv":{
+      "value": "${{TEAMSFX_ENV}}"
+    },
+    "appVersion": {
+      "value": "${{APP_VERSION}}"
+    },
+    "botResourceBaseName": {
+      "value": "bot${{RESOURCE_SUFFIX}}"
+    },
+    "storageSKU": {
+      "value": "Standard_LRS"
+    },
+    "botAadAppClientId": {
+      "value": "${{BOT_ID}}"
+    },
+    "botAadAppClientSecret": {
+      "value": "${{SECRET_BOT_PASSWORD}}"
+    },
+    "botWebAppSKU": {
+      "value": "B1"
+    },
+    "botDisplayName": {
+      "value": "Teams Copilot Starter"
+    },
+    "teamsAppId": {
+      "value": "${{TEAMS_APP_ID}}"
+    },
+    "aadAppClientId": {
+      "value": "${{AAD_APP_CLIENT_ID}}"
+    },
+    "aadAppClientSecret": {
+      "value": "${{SECRET_AAD_APP_CLIENT_SECRET}}"
+    },
+    "aadAppTenantId": {
+      "value": "${{AAD_APP_TENANT_ID}}"
+    },
+    "aadAppOauthAuthorityHost": {
+      "value": "${{AAD_APP_OAUTH_AUTHORITY_HOST}}"
+    },
+    "openAIKey": {
+      "value": "${{OPENAI_KEY}}"
+    },
+    "openAIEndpoint": {
+      "value": "${{OPENAI_ENDPOINT}}"
+    },
+    "openAIModel": {
+      "value": "${{OPENAI_MODEL}}"
+    },
+    "openAIEmbeddingModel": {
+      "value": "${{OPENAI_EMBEDDING_MODEL}}"
+    },
+    "openAIApiVersion": {
+      "value": "${{OPENAI_API_VERSION}}"
+    },
+    "indexFolderPath": {
+      "value": "${{VECTRA_INDEX_PATH}}"
+    },
+    "defaultPromptName": { 
+      "value": "${{DEFAULT_PROMPT_NAME}}"
+    },
+    "storageContainerName": { 
+      "value": "${{STORAGE_CONTAINER_NAME}}"
+    },
+    "webDataSource": {
+      "value": "${{WEBDATA_SOURCE_NAME}}"
+    },
+    "documentDataSource": {
+      "value": "${{DOCUMENTDATA_SOURCE_NAME}}"
+    },
+    "maxTurns": {
+      "value": "${{MAX_TURNS}}"
+    },
+    "maxFileSize": {
+      "value": "${{MAX_FILE_SIZE}}"
+    },
+    "maxPages": {
+      "value": "${{MAX_PAGES}}"
+    }
+  }
+}

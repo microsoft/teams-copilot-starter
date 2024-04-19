@@ -1,0 +1,81 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.16",
+    "version": "${{APP_VERSION}}",
+    "id": "${{TEAMS_APP_ID}}",
+    "packageName": "com.microsoft.teams.extension",
+    "developer": {
+        "name": "Microsoft Corporation",
+        "websiteUrl": "https://www.microsoft.com",
+        "privacyUrl": "https://www.microsoft.com/privatepolicy.aspx",
+        "termsOfUseUrl": "https://www.microsoft.com/termsofuseinfo.aspx"
+    },
+    "icons": {
+        "color": "color.png",
+        "outline": "outline.png"
+    },
+    "name": {
+        "short": "${{APP_NAME}}",
+        "full": "${{APP_NAME}} ${{APP_VERSION}}"
+    },
+    "description": {
+        "short": "${{APP_NAME}}",
+        "full": "${{APP_NAME}} is an AI-powered virtual assistant designed to help users with various tasks, such as answering questions, providing information, and offering suggestions. ${{APP_NAME}} leverages advanced natural language processing and machine learning algorithms to deliver accurate and context-aware information. It can assist with a wide range of topics, including general knowledge, programming, problem-solving, and more. Its primary goal is to make users' lives easier by providing quick and reliable assistance whenever needed. Use App mentioning @Teams Copilot Starter to ask any questions like using ChatGPT in any chat. Look up for companies info in the Copilot Message Extension or send your queries related to the Copilot knowledge database via Microsoft 365 Copilot plugin interface."
+    },
+    "accentColor": "#0028A0",
+    "bots": [
+        {
+            "botId": "${{BOT_ID}}",
+            "scopes": [
+                "personal",
+                "team",
+                "groupchat"
+            ],
+            "supportsFiles": true,
+            "isNotificationOnly": false,
+            "commandLists": []
+        }
+    ],
+    "composeExtensions": [
+        {
+            "botId": "${{BOT_ID}}",
+            "canUpdateConfiguration": true,
+            "commands": [
+                {
+                  "id": "searchCmd",
+                  "type": "query",
+                  "title": "Teams Copilot Starter",
+                  "description": "Get company information from Teams Copilot Starter",
+                  "initialRun": false,
+                  "fetchTask": false,
+                  "context": [
+                      "compose",
+                      "commandBox"
+                  ],
+                  "parameters": [
+                      {
+                      "name": "queryText",
+                      "title": "Query",
+                      "description": "Type in any company name",
+                      "inputType": "text"
+                      }
+                  ]
+                }
+            ]
+        }
+    ],
+    "configurableTabs": [],
+    "staticTabs": [],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
+    ],
+    "validDomains": [
+        "${{BOT_DOMAIN}}"
+    ],
+    "showLoadingIndicator": false,
+    "webApplicationInfo": {
+        "id": "${{AAD_APP_CLIENT_ID}}",
+        "resource": "api://botid-${{BOT_ID}}"
+    }
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1",
+    "name": "Tech Corp",
+    "ticker": "TCO",
+    "address": {
+      "addressLine": "123 Tech addressLine",
+      "city": "Tech City",
+      "city_state": "Tech State",
+      "country": "Tech Country"
+    },
+    "website": "https://techcorp.com",
+    "worldRegion": "North America",
+    "logoUrl": "https://techcorp.com/logo.png"
+  },
+  {
+    "id": "2",
+    "name": "Innovate Inc",
+    "ticker": "INO",
+    "address": {
+      "addressLine": "456 Innovate Road",
+      "city": "Innovate City",
+      "city_state": "Innovate State",
+      "country": "Innovate Country"
+    },
+    "website": "https://innovateinc.com",
+    "worldRegion": "Europe",
+    "logoUrl": "https://innovateinc.com/logo.png"
+  },
+  {
+    "id": "3",
+    "name": "Future LLC",
+    "ticker": "FUT",
+    "address": {
+      "addressLine": "789 Future Avenue",
+      "city": "Future City",
+      "city_state": "Future State",
+      "country": "Future Country"
+    },
+    "website": "https://futurellc.com",
+    "worldRegion": "Asia",
+    "logoUrl": "https://futurellc.com/logo.png"
+  },
+  {
+    "id": "4",
+    "name": "Progressive Pty Ltd",
+    "ticker": "PRO",
+    "address": {
+      "addressLine": "101 Progressive Boulevard",
+      "city": "Progressive City",
+      "city_state": "Progressive State",
+      "country": "Progressive Country" 
+    },
+    "website": "https://progressiveptyltd.com",
+    "worldRegion": "Australia",
+    "logoUrl": "https://progressiveptyltd.com/logo.png"
+  },
+  {
+    "id": "5",
+    "name": "Advanced AG",
+    "ticker": "ADV",
+    "address": {
+      "addressLine": "102 Advanced Drive",
+      "city": "Advanced City",
+      "city_state": "Advanced State",
+      "country": "Advanced Country"
+    },
+    "website": "https://advancedag.com",
+    "worldRegion": "Europe",
+    "logoUrl": "https://advancedag.com/logo.png"
+  }
+]

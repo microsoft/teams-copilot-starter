@@ -1,0 +1,17 @@
+flowchart TD
+    A[fa:fa-user-circle User] -->|fa:fa-bot Tell me about Microsoft| B(fa:fa-commenting Teams Copilot Chat Bot)
+    B -->|Get generic response| C(fa:fa-gear  Chat GPT Skill)
+    B --> D(fa:fa-link Skills Chain or RAG)
+    D -->|fa:fa-search Find Entity| E(fa:fa-gear Entity Recognition Skill)
+    E --> F{fa:fa-code-fork Entity Found}
+    F -->|Get Company Info| G[fa:fa-gear Entity Info Skill]
+    F -->|Get ESG Score| I[fa:fa-gear ESG Score Skill]
+    F -->|Generate Prompts| J[fa:fa-gear Prompts Generation Skill]
+    A -->|fa:fa-keyboard Type: Micr...| K(fa:fa-search-plus Teams Copilot Starter Message Extension)
+    K -->|fa:fa-search Find Entity| E
+    C -->T(Teams AI Library)
+    E -->T
+    G -->T
+    I -->T
+    J -->T
+    T <-->O[=>      Open AI       <=]
