@@ -90,6 +90,18 @@
                 "order": 2
             },
             "stopAll": true
+        },
+        {
+            "name": "Debug in Test Tool (Preview)",
+            "configurations": [
+                "Attach to Local Service"
+            ],
+            "preLaunchTask": "Start Teams App (Test Tool)",
+            "presentation": {
+                "group": "group 0: Teams App Test Tool",
+                "order": 1
+            },
+            "stopAll": true
         }
     ]
 }
