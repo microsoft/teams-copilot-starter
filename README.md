@@ -223,15 +223,21 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 You may encounter the following known issues documented and assigned for the futher investigation in the repo's Issues section:
 
-### Issue [#82](https://github.com/microsoft/teams-copilot-starter/issues/82): Can't process multiple documents
+### Issue [#1](https://github.com/microsoft/teams-copilot-starter/issues/1): The Bot's LLM takes only the first document content embeddings from the Vectra data sources when multiple documents are uploaded
 
 If I try to chat with more than one document in the sequence, you won't get the correct respond from the bot starting from the second uploaded document until you reset the system by prompting `/reset` or ask Bot to forget the previously uploaded documents: `forget documents` or `/forget` using the short command.
 
 This issue will be addressed in the upcoming updates and the status of this issue fix will be posted in the Issues section of the repo.
 
-### Issue [#84](https://github.com/microsoft/teams-copilot-starter/issues/84): The document embeddings are shared by multiple users
+### Issue [#2](https://github.com/microsoft/teams-copilot-starter/issues/2): When multiple users try to chat with their own documents, the Local Vectra Index will contain the documents from all users
 
 If you try to chat with a specific document when running in Azure environment, there are chances that your document will be shared with another user(s).
+
+This issue will be addressed in the upcoming updates and the status of this issue fix will be posted in the Issues section of the repo.
+
+### Issue [#3](https://github.com/microsoft/teams-copilot-starter/issues/3) When more than one document is uploaded, bot returns the same response the same number of times as loaded documents
+
+If you load two or more documents, the bot will give the same result the same number of loaded documents.
 
 This issue will be addressed in the upcoming updates and the status of this issue fix will be posted in the Issues section of the repo.
 
