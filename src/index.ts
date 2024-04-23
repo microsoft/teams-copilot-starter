@@ -122,7 +122,7 @@ server.listen(process.env.PORT || process.env.port || 3978, () => {
   logger.info(`Bot Started, ${server.name} listening to ${server.url}`);
 });
 
-// Listen for incoming requests. 
+// Listen for incoming requests.
 server.post("/api/messages", async (req, res) => {
   await adapter
     .process(req, res, async (context) => {
