@@ -104,9 +104,11 @@ class Env {
     .object({
       TEAMSFX_ENV: z.string().min(1),
       APP_VERSION: z.string().min(1),
-      BOT_ID: z.string().min(1),
-      BOT_PASSWORD: z.string().min(1),
-      BOT_APP_TYPE: z.enum(["UserAssignedMsi", "SingleTenant", "MultiTenant"]),
+      BOT_ID: z.string().min(1).optional(),
+      BOT_PASSWORD: z.string().min(1).optional(),
+      BOT_APP_TYPE: z
+        .enum(["UserAssignedMsi", "SingleTenant", "MultiTenant"])
+        .optional(),
       OPENAI_KEY: z.string().min(1),
       OPENAI_ENDPOINT: z.string().url(),
       OPENAI_MODEL: z.string().min(1), // For Azure OpenAI this is the name of the deployment to use.

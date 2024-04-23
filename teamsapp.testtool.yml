@@ -19,15 +19,11 @@ deploy:
   # Generate runtime environment variables for bot
   - uses: file/createOrUpdateEnvironmentFile
     with:
-      target: ./.localConfigs.testTool
+      target: ./src/.localConfigs.testTool
       envs:
         TEAMSFX_NOTIFICATION_STORE_FILENAME: ${{TEAMSFX_NOTIFICATION_STORE_FILENAME}}
         TEAMSFX_ENV: ${{TEAMSFX_ENV}}
         APP_VERSION: ${{APP_VERSION}}
-        BOT_ID: ${{BOT_ID}}
-        BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
-        BOT_DOMAIN: ${{BOT_DOMAIN}}
-        BOT_APP_TYPE: ${{BOT_APP_TYPE}}
         AAD_APP_CLIENT_ID: ${{AAD_APP_CLIENT_ID}}
         AAD_APP_CLIENT_SECRET: ${{SECRET_AAD_APP_CLIENT_SECRET}}
         AAD_APP_TENANT_ID: ${{AAD_APP_TENANT_ID}}
