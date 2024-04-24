@@ -1,6 +1,6 @@
 .fx
 .deployment
-.localConfigs
+.localConfigs*
 *.js.map
 *.ts.map
 *.ts

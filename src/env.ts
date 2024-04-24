@@ -96,6 +96,32 @@ class Env {
     return isValid;
   };
 
+  private botIDRefiner = (data: any, ctx: RefinementCtx) => {
+    // based on the TeamsFX environment, set the BOT_ID and BOT_PASSWORD
+    let isValid = true;
+    // Check the presence of BOT_ID and BOT_PASSWORD when not using TeamsFX Test Toolkit
+    if (data.TEAMSFX_ENV !== "testtool") {
+      if ((data.BOT_ID?.length ?? 0) === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "BOT_ID is required.",
+          path: [data.BOT_ID],
+        });
+        isValid = false;
+      }
+      if ((data.BOT_PASSWORD?.length ?? 0) === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "BOT_PASSWORD is required.",
+          path: [data.BOT_PASSWORD],
+        });
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  };
+
   private buildVectraIndexPath(value: string, localEnv: boolean): string {
     return localEnv ? path.join(__dirname, value) : value;
   }
@@ -104,9 +130,11 @@ class Env {
     .object({
       TEAMSFX_ENV: z.string().min(1),
       APP_VERSION: z.string().min(1),
-      BOT_ID: z.string().min(1),
-      BOT_PASSWORD: z.string().min(1),
-      BOT_APP_TYPE: z.enum(["UserAssignedMsi", "SingleTenant", "MultiTenant"]),
+      BOT_ID: z.string().optional(),
+      BOT_PASSWORD: z.string().optional(),
+      BOT_APP_TYPE: z
+        .enum(["UserAssignedMsi", "SingleTenant", "MultiTenant"])
+        .optional(),
       OPENAI_KEY: z.string().min(1),
       OPENAI_ENDPOINT: z.string().url(),
       OPENAI_MODEL: z.string().min(1), // For Azure OpenAI this is the name of the deployment to use.
@@ -127,7 +155,8 @@ class Env {
       MAX_FILE_SIZE: z.coerce.number().int().positive(),
       MAX_PAGES: z.coerce.number().int().positive(),
     })
-    .superRefine(this.openAIRefiner);
+    .superRefine(this.openAIRefiner)
+    .superRefine(this.botIDRefiner);
 
   public data: z.infer<typeof this.schema> = {} as z.infer<typeof this.schema>;
 }

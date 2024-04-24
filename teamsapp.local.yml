@@ -102,12 +102,13 @@ deploy:
     with:
       args: install --no-audit
 
-  # Generate runtime environment variables for bot
-  # TeamsFX settings
+# Generate runtime environment variables for bot
+# Custom Settings
   - uses: file/createOrUpdateEnvironmentFile
     with:
       target: ./src/.localConfigs
       envs:
+        # Required custom environment variables
         TEAMSFX_ENV: ${{TEAMSFX_ENV}}
         APP_VERSION: ${{APP_VERSION}}
         BOT_ID: ${{BOT_ID}}
@@ -120,14 +121,6 @@ deploy:
         AAD_APP_OAUTH_AUTHORITY_HOST: ${{AAD_APP_OAUTH_AUTHORITY_HOST}}
         M365_TITLE_ID: ${{M365_TITLE_ID}}
         M365_APP_ID: ${{M365_APP_ID}}
-
-# Generate runtime environment variables for bot
-# Custom Settings
-  - uses: file/createOrUpdateEnvironmentFile
-    with:
-      target: ./src/.localConfigs
-      envs:
-        # Required custom environment variables
         OPENAI_KEY: ${{OPENAI_KEY}}
         OPENAI_ENDPOINT: ${{OPENAI_ENDPOINT}}
         OPENAI_MODEL: ${{OPENAI_MODEL}}

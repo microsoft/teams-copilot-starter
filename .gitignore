@@ -23,3 +23,9 @@ yarn.lock
 
 # Vectra files
 index/
+
+# Teams Test Toolkit
+.localConfigs.testTool
+.teamsapptesttool.yml
+env/.env.testTool
+devTools/*

@@ -148,7 +148,104 @@ This action in the pipeline copies the environment variables from the `.env.loca
 
 ## Testing the sample
 
-The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
+### Teams App Test Tool
+
+The easiest and fastest way to get up and running is with Teams App Test Tool as your local development guide.
+
+>Note:
+>Teams App Test Tool is available in the latest prerelease version of the Microsoft Teams Toolkit. Ensure that you install the [latest prerelease version](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/install-teams-toolkit#install-a-pre-release-version) of the Teams Toolkit.
+
+Teams App Test Tool (Test Tool) makes debugging bot-based apps effortless. You can chat with your bot and see its messages and Adaptive Cards as they appear in Microsoft Teams. You don’t need a Microsoft 365 developer account, tunneling, or Teams app and bot registration to use Test Tool. For more info on what Teams App Test Tool can offer, see this [document](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/debug-your-teams-app-test-tool?tabs=vscode%2Cclijs).
+
+To get Teams Copilot Starter debugging with Teams App Test Tool, follow these steps:
+
+1. Clone `.env.testtool.template` file in `env` folder to `.env.testtool`, then follow the above table to fill out the blanks for the required environment variables.
+
+2. Select `Debug in Test Tool (Preview)` from the Debug Menu, and start the debug (F5).
+
+Optionally, in the project root folder, create `.teamsapptesttool.yml` configuration file that contains the information about the bot, tenant and the test users you want to be part of your test. Below is shown an example configuration file that you can modify per your requirements. For example, you may want to replace the `currentUser` with your real user information from the tenant where you want to test this bot.
+
+```yml
+# yaml-language-server: $schema=https://aka.ms/teams-app-test-tool-config/0.1.0/config.schema.json
+# Visit https://aka.ms/teams-app-test-tool-config-guide for more details on this file.
+
+# This configuration file customizes the Teams context information like chats, teams, and users.
+# It contains mock data for testing Bot Framework APIs or Bot Builder SDK methods such as TeamsInfo.getTeamMembers().
+# You can customize this file to change API response if your bot code uses these APIs.
+version: "0.1.0"
+tenantId: 00000000-0000-0000-0000-0000000000001
+bot:
+  id: 00000000-0000-0000-0000-00000000000011
+  name: Test Bot
+currentUser:
+  id: user-id-0
+  name: Alex Wilber
+  userPrincipleName: alexw@example.com
+  aadObjectId: 00000000-0000-0000-0000-0000000000020
+  givenName: Alex
+  surname: Wilber
+  email: alexw@example.com
+users:
+  - id: user-id-1
+    name: Megan Bowen
+    userPrincipleName: meganb@example.com
+    aadObjectId: 00000000-0000-0000-0000-0000000000021
+    givenName: Megan
+    surname: Bowen
+    email: meganb@example.com
+  - id: user-id-2
+    name: Adele Vance
+    userPrincipleName: adelev@example.com
+    aadObjectId: 00000000-0000-0000-0000-0000000000022
+    givenName: Adele
+    surname: Vance
+    email: adelev@example.com
+  - id: user-id-3
+    name: Isaiah Langer
+    userPrincipleName: isaiah@example.com
+    aadObjectId: 00000000-0000-0000-0000-0000000000023
+    givenName: Isaiah
+    surname: Langer
+    email: isaiahl@example.com
+  - id: user-id-4
+    name: Patti Fernandez
+    userPrincipleName: pattif@example.com
+    aadObjectId: 00000000-0000-0000-0000-0000000000024
+    givenName: Patti
+    surname: Fernandez
+    email: pattif@example.com
+  - id: user-id-5
+    name: Lynne Robbins
+    userPrincipleName: lynner@example.com
+    aadObjectId: 00000000-0000-0000-0000-0000000000025
+    givenName: Lynne
+    surname: Robbins
+    email: lynner@example.com
+personalChat:
+  id: personal-chat-id
+groupChat:
+  id: group-chat-id
+  name: Group Chat
+team:
+  id: team-id
+  name: My Team
+  aadGroupId: 00000000-0000-0000-0000-000000000031
+  channels:
+    - id: channel-announcements-id
+      name: Announcements
+```
+
+It's vital to recognize that updating the configuration file has three major impacts:
+
+- It influences the responses obtained from Bot Framework Connector APIs, for example, `TeamsInfo.getPagedMembers()`.
+- It shapes the details in the activity payload, for example, activity.recipient.
+- It impacts the user interface in Test Tool, for example, group chat names.
+
+>Note: please consult with the Teams App Test Tool documentation about the current limitations of using this framework when testing your Teams Copilot Starter project.
+
+### Running Locally using Teams Toolkit Full Debugging Functionality
+
+To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
 
 1. Press F5 to start debugging which launches your app in Teams using a web browser. Select `Debug (Edge)` or `Debug (Chrome)`. This action will:
 
