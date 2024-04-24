@@ -151,7 +151,7 @@ class Env {
       APPLICATIONINSIGHTS_INSTRUMENTATION_KEY: z.string().optional(),
       CUSTOM_API_CLIENT_ID: z.string().optional(),
       CUSTOM_API_CLIENT_SECRET: z.string().optional(),
-      MAX_TURNS: z.coerce.number().int().positive(),
+      MAX_TURNS: z.coerce.number().int().positive().default(10),
       MAX_FILE_SIZE: z.coerce.number().int().positive(),
       MAX_PAGES: z.coerce.number().int().positive(),
     })

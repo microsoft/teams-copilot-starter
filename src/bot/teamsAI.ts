@@ -139,7 +139,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
 
     // Create a local Vectra index
     this.LocalVectraIndex = new LocalDocumentIndex({
-      folderPath: this.env.data.VECTRA_INDEX_PATH,
+      folderPath: this.env.data.VECTRA_INDEX_PATH!,
     });
 
     // Listen for new members to join the conversation
@@ -491,7 +491,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
    */
   public async start(context: TurnContext): Promise<void> {
     // Create the local Vectra index, if it does not exist
-    const index = new LocalDocumentIndex({ folderPath: this.env.data.VECTRA_INDEX_PATH });
+    const index = new LocalDocumentIndex({ folderPath: this.env.data.VECTRA_INDEX_PATH! });
     if (!await index.isIndexCreated()) {
       await index.createIndex({ version: 1, deleteIfExists: true });
     }

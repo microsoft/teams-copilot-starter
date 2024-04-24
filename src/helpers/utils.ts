@@ -21,7 +21,7 @@ const TYPING_TIMER_DELAY = 1000;
 export class Utils {
   static async MaxTurnsToRemember(): Promise<number> {
     const env = container.resolve(Env);
-    return env.data.MAX_TURNS * 2;
+    return env.data.MAX_TURNS! * 2;
   }
 
   /**
