@@ -110,7 +110,7 @@ export class ChatGPTSkill extends BaseAISkill {
         return undefined;
       }
 
-      return response.message?.content;
+      return Utils.extractJsonResponse(response.message?.content);
     } catch (error: any) {
       if (error.name === "AxiosError" && error.message.includes("429")) {
         await this.context.sendActivity(responses.openAIRateLimited());

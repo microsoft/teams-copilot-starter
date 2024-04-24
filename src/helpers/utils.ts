@@ -53,8 +53,11 @@ export class Utils {
     try {
       // Parse the content to check if it is an Action Plan JSON string
       const actionPlanJson = Utils.ensureJsonResponse(content);
-      return actionPlanJson?.commands.find((cmd: any) => cmd.type === "SAY")
-        ?.response;
+      if (actionPlanJson && actionPlanJson?.commands) {
+        return actionPlanJson?.commands.find((cmd: any) => cmd.type === "SAY")?.response;
+      } else {
+        return actionPlanJson?.content ?? content;
+      }
     } catch (error) {
       return content;
     }
