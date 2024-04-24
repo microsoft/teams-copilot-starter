@@ -38,7 +38,7 @@ export class Utils {
     }
     try {
       // Try to parse the original content as JSON
-      return JSON.parse(content);
+      return JSON.parse(content.replace(/\n/g, "<br/>"));
     } catch (error) {
       return content;
     }
