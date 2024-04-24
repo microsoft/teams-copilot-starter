@@ -93,26 +93,6 @@ class Env {
       data.TEAMSFX_ENV === "local"
     );
 
-    // Check the presence of BOT_ID and BOT_PASSWORD when not using TeamsFX Test Toolkit
-    if (data.TEAMSFX_ENV !== "testtool") {
-      if ((data.BOT_ID?.length ?? 0) === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "BOT_ID is required.",
-          path: [data.BOT_ID],
-        });
-        isValid = false;
-      }
-      if ((data.BOT_PASSWORD?.length ?? 0) === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "BOT_PASSWORD is required.",
-          path: [data.BOT_PASSWORD],
-        });
-        isValid = false;
-      }
-    }
-
     return isValid;
   };
 
