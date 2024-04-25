@@ -243,6 +243,14 @@ It's vital to recognize that updating the configuration file has three major imp
 
 >Note: please consult with the Teams App Test Tool documentation about the current limitations of using this framework when testing your Teams Copilot Starter project.
 
+#### Feature not available in Teams App Test tool
+
+The following features are not available in the Teams App Test tool
+
+1. The Teams App Test tool only works with bots. Tabs are not supported
+1. It is not supported to upload document. This will limit the PDF Skill or customization required manual upload of documents to be tested using the Test tool.
+1. The application/vnd.microsoft.card.oauth is not supported. This will make it not possible to start signin process using using the test tool as described in samples <https://github.com/microsoft/teams-ai/tree/main/js/samples/05.authentication>.
+
 ### Running Locally using Teams Toolkit Full Debugging Functionality
 
 To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).

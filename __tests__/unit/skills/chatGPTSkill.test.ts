@@ -70,6 +70,11 @@ describe("ChatGPTSkill", () => {
     );
     mockCompletePrompt.mockImplementation(() => Promise.resolve(mockedResult));
 
+    const mockedExtractJsonResponse = jest.spyOn(Utils, "extractJsonResponse");
+    mockedExtractJsonResponse.mockImplementation(
+      (inputString: string | undefined) => inputString ?? ""
+    );
+
     const result = await chatGPTSkill.run(input);
 
     expect(result).toBe(expectedContent);
