@@ -57,12 +57,12 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 logger.info("Creating BlobsStorage");
 const storage = new BlobsStorage(
   `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
-  envVariables.data.STORAGE_CONTAINER_NAME
+  envVariables.data.STORAGE_CONTAINER_NAME!
 );
 
 const storageLeaseManager = new BlobsStorageLeaseManager(
   `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
-  `${envVariables.data.STORAGE_CONTAINER_NAME}-state-manager`
+  `${envVariables.data.STORAGE_CONTAINER_NAME!}-state-manager`
 );
 
 container.register<BlobsStorageLeaseManager>(BlobsStorageLeaseManager, {
