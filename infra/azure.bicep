@@ -55,7 +55,6 @@ var outlookDesktopAppClientId = 'd3590ed6-52b3-4102-aeff-aad2292ab01c'
 var outlookWebAppClientId = '00000002-0000-0ff1-ce00-000000000000'
 var authorizedClientApplicationIds = '${teamsMobileOrDesktopAppClientId};${teamsWebAppClientId};${officeWebAppClientId1};${officeWebAppClientId2};${outlookDesktopAppClientId};${outlookWebAppClientId}'
 
-
 ///////////////////////////////////////////////////////
 // BOT
 ///////////////////////////////////////////////////////
