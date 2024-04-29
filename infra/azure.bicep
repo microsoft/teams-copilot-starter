@@ -9,7 +9,7 @@ param botAadAppClientId string
 @secure()
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
-
+param botAppType string
 param teamsFxEnv string
 param appVersion string
 
@@ -143,6 +143,7 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
     BOT_ID: botAadAppClientId
     BOT_PASSWORD: botAadAppClientSecret
     BOT_DOMAIN: botWebApp.properties.defaultHostName
+    BOT_APP_TYPE: botAppType
     AAD_APP_CLIENT_ID: aadAppClientId
     AAD_APP_CLIENT_SECRET: aadAppClientSecret
     AAD_APP_TENANT_ID: aadAppTenantId
