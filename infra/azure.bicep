@@ -9,7 +9,7 @@ param botAadAppClientId string
 @secure()
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
-
+param botAppType string
 param teamsFxEnv string
 param appVersion string
 
@@ -54,6 +54,7 @@ var officeWebAppClientId2 = '4765445b-32c6-49b0-83e6-1d93765276ca'
 var outlookDesktopAppClientId = 'd3590ed6-52b3-4102-aeff-aad2292ab01c'
 var outlookWebAppClientId = '00000002-0000-0ff1-ce00-000000000000'
 var authorizedClientApplicationIds = '${teamsMobileOrDesktopAppClientId};${teamsWebAppClientId};${officeWebAppClientId1};${officeWebAppClientId2};${outlookDesktopAppClientId};${outlookWebAppClientId}'
+
 
 ///////////////////////////////////////////////////////
 // BOT
@@ -143,6 +144,7 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
     BOT_ID: botAadAppClientId
     BOT_PASSWORD: botAadAppClientSecret
     BOT_DOMAIN: botWebApp.properties.defaultHostName
+    BOT_APP_TYPE: botAppType
     AAD_APP_CLIENT_ID: aadAppClientId
     AAD_APP_CLIENT_SECRET: aadAppClientSecret
     AAD_APP_TENANT_ID: aadAppTenantId

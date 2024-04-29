@@ -17,6 +17,9 @@
     "botAadAppClientId": {
       "value": "${{BOT_ID}}"
     },
+    "botAppType": {
+      "value": "${{BOT_APP_TYPE}}"
+    },
     "botAadAppClientSecret": {
       "value": "${{SECRET_BOT_PASSWORD}}"
     },
