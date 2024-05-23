@@ -57,9 +57,9 @@ const botFrameworkAuthentication: ConfigurationBotFrameworkAuthentication =
 const adapter = new TeamsAdapter(
   {},
   new ConfigurationServiceClientCredentialFactory({
-      MicrosoftAppId: process.env.BOT_ID,
-      MicrosoftAppPassword: process.env.BOT_PASSWORD,
-      MicrosoftAppType: 'MultiTenant'
+    MicrosoftAppId: process.env.BOT_ID,
+    MicrosoftAppPassword: process.env.BOT_PASSWORD,
+    MicrosoftAppType: "MultiTenant",
   })
 );
 
