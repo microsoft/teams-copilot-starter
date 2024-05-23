@@ -8,6 +8,7 @@ import * as path from "path";
 import {
   CloudAdapter,
   ConfigurationBotFrameworkAuthentication,
+  ConfigurationServiceClientCredentialFactory,
   TurnContext,
 } from "botbuilder";
 
@@ -22,6 +23,7 @@ import { BlobsStorage } from "botbuilder-azure-blobs";
 import { ConsoleLogger } from "./telemetry/consoleLogger";
 import { AppInsightLogger } from "./telemetry/appInsightLogger";
 import { BlobsStorageLeaseManager } from "./helpers/blobsStorageLeaseManager";
+import { TeamsAdapter } from "@microsoft/teams-ai";
 
 // Create an instance of the environment variables
 const envVariables: Env = new Env();
@@ -52,7 +54,14 @@ const botFrameworkAuthentication: ConfigurationBotFrameworkAuthentication =
   configureBotFramework(logger, envVariables);
 
 // Create adapter.
-const adapter = new CloudAdapter(botFrameworkAuthentication);
+const adapter = new TeamsAdapter(
+  {},
+  new ConfigurationServiceClientCredentialFactory({
+      MicrosoftAppId: process.env.BOT_ID,
+      MicrosoftAppPassword: process.env.BOT_PASSWORD,
+      MicrosoftAppType: 'MultiTenant'
+  })
+);
 
 logger.info("Creating BlobsStorage");
 const storage = new BlobsStorage(
@@ -70,10 +79,10 @@ container.register<BlobsStorageLeaseManager>(BlobsStorageLeaseManager, {
 });
 
 // Create the bot that will handle incoming messages.
-const bot = configureTeamsAI(storage, logger, envVariables);
+const bot = configureTeamsAI(storage, adapter, logger, envVariables);
 
 // Add a custom response formatter to convert markdown code blocks to <pre> tags
-addResponseFormatter(bot);
+addResponseFormatter(bot.app);
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
@@ -129,7 +138,7 @@ server.post("/api/messages", async (req, res) => {
       // If the bot is not running, start it.
       await bot.start(context);
       // Run the bot's message processing pipeline.
-      await bot.run(context);
+      await bot.app.run(context);
     })
     .catch((err) => {
       // Error message including "412" means it is waiting for user's consent, which is a normal process of SSO, sholdn't throw this error.

@@ -17,8 +17,8 @@ export function addResponseFormatter(app: Application): void {
       let addTag = false;
       let inCodeBlock = false;
       const output: string[] = [];
-      const response = data.response.split("\n");
-      for (const line of response) {
+      const response = data.response.content?.split("\n");
+      for (const line of response ?? []) {
         if (line.startsWith("```")) {
           if (!inCodeBlock) {
             // Add tag to start of next line
