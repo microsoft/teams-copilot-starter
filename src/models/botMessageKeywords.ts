@@ -7,4 +7,5 @@ export enum BotMessageKeywords {
   history = "/history",
   reset = "/reset",
   welcome = "/welcome",
+  me = "/me",
 }

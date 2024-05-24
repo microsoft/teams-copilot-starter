@@ -10,13 +10,15 @@ import {
   Memory,
   TeamsAdapter,
   ApplicationBuilder,
+  AuthError,
 } from "@microsoft/teams-ai";
 import {
   ActivityTypes,
   TaskModuleTaskInfo,
   TurnContext,
   Storage,
-  Activity
+  Activity,
+  CardFactory
 } from "botbuilder";
 import { ApplicationTurnState, ChatParameters, TData } from "../models/aiTypes";
 import { Utils } from "../helpers/utils";
@@ -50,7 +52,8 @@ import {
   flaggedInputAction,
   flaggedOutputAction,
   unknownAction,
-  webRetrieval
+  webRetrieval,
+  getMyInformation
 } from "../actions";
 import * as functionNames from "../functions/functionNames";
 import {
@@ -96,6 +99,7 @@ export class TeamsAI {
   private readonly env: Env;
   private readonly LocalVectraIndex: LocalDocumentIndex;
   private readonly stateStorageManager: BlobsStorageLeaseManager;
+  private readonly authConnectionName = "graph";;
 
   // The name of the channel for M365 Message Extensions
   public static readonly M365CopilotSourceName = "copilot";
@@ -114,6 +118,23 @@ export class TeamsAI {
       .withAIOptions({
         planner: planner,
         allow_looping: false, // set false for sequence augmentation to prevent sending the return value of the last action to the AI.run method
+      })
+      .withAuthentication(adapter, {
+        settings: {
+            graph: {
+                scopes: ["User.Read"],
+                msalConfig: {
+                    auth: {
+                        clientId: process.env.AAD_APP_CLIENT_ID!,
+                        clientSecret: process.env.AAD_APP_CLIENT_SECRET!,
+                        authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/${process.env.AAD_APP_TENANT_ID}`
+                    }
+                },
+                signInLink: `https://${process.env.BOT_DOMAIN}/auth-start.html`,
+                endOnInvalidMessage: true
+            }
+        },
+        autoSignIn: true
       })
       .build();
     return ai;
@@ -147,6 +168,71 @@ export class TeamsAI {
     // Create a local Vectra index
     this.LocalVectraIndex = new LocalDocumentIndex({
       folderPath: this.env.data.VECTRA_INDEX_PATH!,
+    });
+
+    /**********************************************************************
+     * FUNCTION:Handlers for authentication
+     **********************************************************************/
+    this.app.authentication.get(this.authConnectionName).onUserSignInSuccess(async (context: TurnContext, state: ApplicationTurnState) => {
+      // Successfully logged in
+      const card = {
+        type: "AdaptiveCard",
+        version: "1.0",
+        body: [
+          {
+            type: "TextBlock",
+            text: "We needed to sign you in.",
+            style: "heading",
+            size: "ExtraLarge",
+            color: "Good"
+          },
+          {
+            type: "TextBlock",
+            text: `Your are now signed in as: ${context.activity.from.name}`
+          },
+          {
+            type: "TextBlock",
+            text: "Click the button below to continue your conversation."
+          }
+        ],
+        actions: [
+          {
+            "type": "Action.Submit",
+            "title": `"${context.activity.text}"`,
+            "data": {
+              "msteams": {
+                  "type": "imBack",
+                  "value": `${context.activity.text}`
+              }
+            }
+          }
+        ]
+      };
+    
+      const adaptiveCard = CardFactory.adaptiveCard(card);
+      await context.sendActivity({ attachments: [adaptiveCard] });      
+    });
+  
+    this.app.authentication
+      .get(this.authConnectionName)
+      .onUserSignInFailure(async (context: TurnContext, _state: ApplicationTurnState, error: AuthError) => {
+          // Failed to login
+          await context.sendActivity("Failed to login");
+          await context.sendActivity(`Error message: ${error.message}`);
+    });
+
+    this.app.message("/signout", async (context: TurnContext, state: ApplicationTurnState) => {
+      await this.app.authentication.signOutUser(context, state);
+  
+      // Echo back users request
+      await context.sendActivity("You have signed out");
+    });
+
+    this.app.message("/signin", async (context: TurnContext, state: ApplicationTurnState) => {
+      const response = await this.app.authentication.signUserIn(context, state);
+  
+      // Echo back users request
+      await context.sendActivity("Sign in request sent");
     });
 
     // Listen for new members to join the conversation
@@ -254,6 +340,13 @@ export class TeamsAI {
      *****************************************************************/
     // Define a prompt action when the user sends a message containing the "forgetDocuments" action
     this.app.ai.action(actionNames.forgetDocuments, forgetDocuments);
+
+    /******************************************************************
+     * ACTION: Get Information about me from Graph
+     *****************************************************************/
+    // Define a prompt action when the user sends a message containing the "getMyINformation" action
+    this.app.ai.action(actionNames.getMyInformation, getMyInformation);
+
 
     /******************************************************************
      * ADAPTIVE CARD ACTIONS: GetCompanyDetails

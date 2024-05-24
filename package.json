@@ -46,7 +46,6 @@
   },
   "dependencies": {
     "@azure/app-configuration": "^1.6.0",
-    "@azure/msal-node": "^2.8.1",
     "@microsoft/microsoft-graph-client": "^3.0.1",
     "@microsoft/teams-ai": "~1.2.1",
     "@microsoft/teamsfx": "^2.0.0",

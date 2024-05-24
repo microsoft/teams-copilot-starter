@@ -58,5 +58,9 @@
   {
     "name": "forgetDocuments",
     "description": "Forgets (unloads) all uploaded documents from the conversation state"
+  },
+  {
+    "name": "getMyInformation",
+    "description": "Get information about me (the user)"
   }
 ]

@@ -9,6 +9,7 @@ import {
   CloudAdapter,
   ConfigurationBotFrameworkAuthentication,
   ConfigurationServiceClientCredentialFactory,
+  MemoryStorage,
   TurnContext,
 } from "botbuilder";
 
@@ -58,11 +59,12 @@ const adapter = new TeamsAdapter(
   })
 );
 
-logger.info("Creating BlobsStorage");
-const storage = new BlobsStorage(
-  `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
-  envVariables.data.STORAGE_CONTAINER_NAME!
-);
+// logger.info("Creating BlobsStorage");
+// const storage = new BlobsStorage(
+//   `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
+//   envVariables.data.STORAGE_CONTAINER_NAME!
+// );
+const storage = new MemoryStorage();
 
 const storageLeaseManager = new BlobsStorageLeaseManager(
   `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
@@ -131,7 +133,7 @@ server.post("/api/messages", async (req, res) => {
   await adapter
     .process(req, res, async (context) => {
       // If the bot is not running, start it.
-      await bot.start(context);
+      // await bot.start(context);
       // Run the bot's message processing pipeline.
       await bot.app.run(context);
     })
