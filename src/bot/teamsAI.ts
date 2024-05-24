@@ -107,7 +107,7 @@ export class TeamsAI {
   public static readonly BeforeTurn = "beforeTurn";
   public static readonly AfterTurn = "afterTurn";
 
-  public configureAI(botId: string, adapter: TeamsAdapter, storage: Storage, planner: ActionPlanner<ApplicationTurnState>): Application<ApplicationTurnState> {
+  private configureAI(botId: string, adapter: TeamsAdapter, storage: Storage, planner: ActionPlanner<ApplicationTurnState>): Application<ApplicationTurnState> {
     const ai = new ApplicationBuilder<ApplicationTurnState>()
       .withStorage(storage)
       .withLongRunningMessages(adapter, botId)

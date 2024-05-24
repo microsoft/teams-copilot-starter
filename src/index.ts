@@ -16,7 +16,6 @@ import { AxiosError } from "axios";
 import { container } from "tsyringe";
 import { logging } from "./telemetry/loggerManager";
 import { configureTeamsAI } from "./configTeamsAI";
-import { configureBotFramework } from "./configBotFramework";
 import { addResponseFormatter } from "./responseFormatter";
 import { Env } from "./env";
 import { BlobsStorage } from "botbuilder-azure-blobs";
@@ -48,10 +47,6 @@ const logger = logging.getLogger("index");
 container.register<Env>(Env, {
   useValue: envVariables,
 });
-
-// Configure Bot Framework Authentication
-const botFrameworkAuthentication: ConfigurationBotFrameworkAuthentication =
-  configureBotFramework(logger, envVariables);
 
 // Create adapter.
 const adapter = new TeamsAdapter(
