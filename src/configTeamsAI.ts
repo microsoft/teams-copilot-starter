@@ -5,6 +5,7 @@ import {
   OpenAIModel,
   PromptCompletionModel,
   PromptManager,
+  TeamsAdapter,
 } from "@microsoft/teams-ai";
 import path from "path";
 import { TeamsAI } from "./bot/teamsAI";
@@ -24,12 +25,14 @@ import { Utils } from "./helpers/utils";
  */
 export function configureTeamsAI(
   storage: Storage,
+  adapter: TeamsAdapter,
   logger: Logger,
   env: Env
 ): TeamsAI {
   logger.info("Configuring Teams AI");
   // Retrieve all configuration settings asynchronously
   logger.info("Retrieving configuration settings for Teams AI");
+  const botAppId = process.env["BOT_ID"]!;
 
   let model: PromptCompletionModel;
 
@@ -89,7 +92,7 @@ export function configureTeamsAI(
   });
 
   // Create the bot that will handle incoming messages.
-  const bot = new TeamsAI(storage, planner);
+  const bot = new TeamsAI(botAppId, adapter, storage, planner);
 
   // Create the Teams AI Action Planner Middleware
   const actionPlannerMiddleware = new ActionPlannerMiddleware(bot, logger);

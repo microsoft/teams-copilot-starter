@@ -171,7 +171,7 @@ export class ActionPlannerMiddleware {
       // Convert the parallel actions to an array of tasks
       const parallelActionTasks = currentCmd.parallelActions.map(
         (action: PredictedDoCommand) => {
-          return this.teamsAI.ai.doAction(
+          return this.teamsAI.app.ai.doAction(
             context,
             state,
             action.action,
@@ -182,12 +182,12 @@ export class ActionPlannerMiddleware {
 
       // Execute the current action and all its parallel actions in parallel
       [actionOutput] = await Promise.all([
-        this.teamsAI.ai.doAction(context, state, action, cmd.parameters),
+        this.teamsAI.app.ai.doAction(context, state, action, cmd.parameters),
         Promise.all(parallelActionTasks),
       ]);
     } else {
       // Continue executing the current action
-      actionOutput = await this.teamsAI.ai.doAction(
+      actionOutput = await this.teamsAI.app.ai.doAction(
         context,
         state,
         action,
@@ -211,7 +211,7 @@ export class ActionPlannerMiddleware {
     switch (action) {
       case AI.PlanReadyActionName:
         // Replace the default action planner handler with the middleware handler
-        this.teamsAI.ai.action(
+        this.teamsAI.app.ai.action(
           AI.PlanReadyActionName,
           async (
             context: TurnContext,
@@ -224,7 +224,7 @@ export class ActionPlannerMiddleware {
         break;
 
       case AI.DoCommandActionName:
-        this.teamsAI.ai.action(
+        this.teamsAI.app.ai.action(
           AI.DoCommandActionName,
           async (
             context: TurnContext,

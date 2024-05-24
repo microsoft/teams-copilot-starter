@@ -8,6 +8,8 @@ import {
   ActionPlanner,
   Query,
   Memory,
+  TeamsAdapter,
+  ApplicationBuilder,
 } from "@microsoft/teams-ai";
 import {
   ActivityTypes,
@@ -87,7 +89,8 @@ logging
 
 
 // Define the TeamsAI class that extends the Application class
-export class TeamsAI extends Application<ApplicationTurnState> {
+export class TeamsAI {
+  public readonly app: Application<ApplicationTurnState>;
   private readonly logger: Logger;
   private readonly planner: ActionPlanner<ApplicationTurnState>;
   private readonly env: Env;
@@ -104,6 +107,18 @@ export class TeamsAI extends Application<ApplicationTurnState> {
   public static readonly BeforeTurn = "beforeTurn";
   public static readonly AfterTurn = "afterTurn";
 
+  private configureAI(botId: string, adapter: TeamsAdapter, storage: Storage, planner: ActionPlanner<ApplicationTurnState>): Application<ApplicationTurnState> {
+    const ai = new ApplicationBuilder<ApplicationTurnState>()
+      .withStorage(storage)
+      .withLongRunningMessages(adapter, botId)
+      .withAIOptions({
+        planner: planner,
+        allow_looping: false, // set false for sequence augmentation to prevent sending the return value of the last action to the AI.run method
+      })
+      .build();
+    return ai;
+  };
+  
   /**
    * The TeamsAI constructor.
    * @param storage - The storage to use for the conversation store.
@@ -112,21 +127,13 @@ export class TeamsAI extends Application<ApplicationTurnState> {
    * @remarks
    */
   constructor(
+    botAppId: string,
+    adapter: TeamsAdapter,
     storage: Storage,
     planner: ActionPlanner<ApplicationTurnState>
   ) {
-    if (planner) {
-      super({
-        storage: storage,
-        ai: {
-          planner,
-          allow_looping: false, // set false for sequence augmentation to prevent sending the return value of the last action to the AI.run method
-        }
-      });
-    } else {
-      super({ storage });
-    }
-    
+    // Create the AI application
+    this.app = this.configureAI(botAppId, adapter, storage, planner);    
     this.planner = planner;
 
     this.logger = logging.getLogger("bot.TeamsAI");
@@ -143,7 +150,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     });
 
     // Listen for new members to join the conversation
-    this.conversationUpdate(
+    this.app.conversationUpdate(
       "membersAdded",
       async (context: TurnContext, state: ApplicationTurnState) => {
         const membersAdded = context.activity.membersAdded || [];
@@ -163,9 +170,9 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     );
 
     // Register a handler to handle unknown actions that might be predicted
-    this.ai.action(actionNames.unknownAction, unknownAction);
-    this.ai.action(actionNames.flaggedInputAction, flaggedInputAction);
-    this.ai.action(actionNames.flaggedOutputAction, flaggedOutputAction);
+    this.app.ai.action(actionNames.unknownAction, unknownAction);
+    this.app.ai.action(actionNames.flaggedInputAction, flaggedInputAction);
+    this.app.ai.action(actionNames.flaggedOutputAction, flaggedOutputAction);
 
     /**********************************************************************
      * FUNCTION: GET ACTIONS
@@ -207,22 +214,22 @@ export class TeamsAI extends Application<ApplicationTurnState> {
      * ACTION: DEBUG
      *****************************************************************/
     // Register debug on action
-    this.ai.action(actionNames.debugOn, debugOn);
+    this.app.ai.action(actionNames.debugOn, debugOn);
 
     // Register debug off action
-    this.ai.action(actionNames.debugOff, debugOff);
+    this.app.ai.action(actionNames.debugOff, debugOff);
 
     /******************************************************************
      * ACTION: GET COMPANY INFO
      *****************************************************************/
     // Define a prompt action when the user sends a message containing the "getLatestInfo" action
-    this.ai.action(actionNames.getCompanyInfo, async (context: TurnContext, state: ApplicationTurnState) => getCompanyInfo(context, state, this.planner));
+    this.app.ai.action(actionNames.getCompanyInfo, async (context: TurnContext, state: ApplicationTurnState) => getCompanyInfo(context, state, this.planner));
 
     /******************************************************************
      * ACTION: GET COMPANY DETAILS
      *****************************************************************/
     // Define a prompt action when the user sends a message containing the "getLatestInfo" action
-    this.ai.action(
+    this.app.ai.action(
       actionNames.getCompanyDetails, 
       async (context: TurnContext, state: ApplicationTurnState, parameters: ChatParameters) => getCompanyDetails(context, state, parameters, this.planner));
 
@@ -230,7 +237,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
      * ACTION: CHAT WITH YOUR OWN DATA
      *****************************************************************/
     // Define a prompt action when the user sends a message containing the "chatWithDocument" action
-    this.ai.action(
+    this.app.ai.action(
       actionNames.chatWithDocument, 
       async (context: TurnContext, state: ApplicationTurnState, parameters: ChatParameters) => chatWithDocument(context, state, parameters, this.planner));
 
@@ -238,7 +245,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
      * ACTION: WEB RETRIEVAL
      *****************************************************************/
     // Define a prompt action when the user sends a message containing the "webRetrieval" action
-    this.ai.action(
+    this.app.ai.action(
       actionNames.webRetrieval,
       async (context: TurnContext, state: ApplicationTurnState, parameters: ChatParameters) => webRetrieval(context, state, parameters, this.planner));
 
@@ -246,30 +253,30 @@ export class TeamsAI extends Application<ApplicationTurnState> {
      * ACTION: FORGET DOCUMENTS
      *****************************************************************/
     // Define a prompt action when the user sends a message containing the "forgetDocuments" action
-    this.ai.action(actionNames.forgetDocuments, forgetDocuments);
+    this.app.ai.action(actionNames.forgetDocuments, forgetDocuments);
 
     /******************************************************************
      * ADAPTIVE CARD ACTIONS: GetCompanyDetails
      *****************************************************************/
-    this.adaptiveCards.actionExecute(
+    this.app.adaptiveCards.actionExecute(
       acActionNames.suggestedPrompt,
       async (context: TurnContext, state: ApplicationTurnState, data: PromptMessage) => suggestedPrompt(context, state, data, this.planner));
 
     // Listen for Other Company command on thr adaptive card from the user
-    this.adaptiveCards.actionExecute(
+    this.app.adaptiveCards.actionExecute(
       acActionNames.otherCompany,
       async (context: TurnContext, state: ApplicationTurnState, data: PromptMessage) => otherCompany(context, state, data, this.planner));
 
     // Listen for /forgetDocument command and then delete the document properties from state
-    this.adaptiveCards.actionExecute(actionNames.forgetDocuments, forgetDocuments);
+    this.app.adaptiveCards.actionExecute(actionNames.forgetDocuments, forgetDocuments);
 
     // List for message extension search command
-    this.messageExtensions.query(commandNames.searchCmd, async (context: TurnContext, state: ApplicationTurnState, query: Query<Record<string, any>>) => searchCmd(context, state, query, this.planner, this.logger));
+    this.app.messageExtensions.query(commandNames.searchCmd, async (context: TurnContext, state: ApplicationTurnState, query: Query<Record<string, any>>) => searchCmd(context, state, query, this.planner, this.logger));
 
     // Listen for message extension select item command
-    this.messageExtensions.selectItem(selectItem);
+    this.app.messageExtensions.selectItem(selectItem);
 
-    this.taskModules.fetch(
+    this.app.taskModules.fetch(
       actionNames.getCompanyInfo,
       async (
         context: TurnContext,
@@ -302,7 +309,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     );
 
     // Listen for /reset command and then delete the conversation state
-    this.message(
+    this.app.message(
       BotMessageKeywords.reset,
       async (context: TurnContext, state: ApplicationTurnState) => {
         state.deleteConversationState();
@@ -326,7 +333,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     );
 
     // Listen for /forget command and then delete the document properties from state
-    this.message(
+    this.app.message(
       BotMessageKeywords.forget,
       async (context: TurnContext, state: ApplicationTurnState) => {
         await context.sendActivity("Uploaded document has been forgotten.");
@@ -344,7 +351,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     );
 
     // Listen for /welcome command and then delete the conversation state
-    this.message(
+    this.app.message(
       BotMessageKeywords.welcome,
       async (context: TurnContext, state: ApplicationTurnState) => {
         state.user.greeted = true;
@@ -358,7 +365,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     );
 
     // Listen for /history command and then delete the conversation state
-    this.message(
+    this.app.message(
       BotMessageKeywords.history,
       async (context: TurnContext, state: ApplicationTurnState) => {
         const maxTurnsToRemember = await Utils.MaxTurnsToRemember();
@@ -386,7 +393,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     );
 
     // Listen for /document command and show delete the document properties from state
-    this.message(
+    this.app.message(
       BotMessageKeywords.document,
       async (context: TurnContext, state: ApplicationTurnState) => {
         if (
@@ -408,7 +415,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     );
 
     // Listen for /document command and show delete the document properties from state
-    this.message(
+    this.app.message(
       BotMessageKeywords.debug,
       async (context: TurnContext, state: ApplicationTurnState) => {
         await context.sendActivity(
@@ -417,7 +424,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
       }
     );
 
-    this.message(
+    this.app.message(
       BotMessageKeywords.chatGPT,
       async (context: TurnContext, state: ApplicationTurnState) => {
         // change the prompt folder to ChatGPT
@@ -426,7 +433,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
       }
     );
 
-    this.message(
+    this.app.message(
       BotMessageKeywords.chatDocument,
       async (context: TurnContext, state: ApplicationTurnState) => {
         // change the prompt folder to ChatGPT
@@ -438,7 +445,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
     // In order to avoid the bot from processing multiple messages at the same time, 
     // We need manage the distributed state of the bot instance that is processing the
     // Request for a specific conversation.
-    this.turn(TeamsAI.BeforeTurn, async (context: TurnContext, state: ApplicationTurnState) => {
+    this.app.turn(TeamsAI.BeforeTurn, async (context: TurnContext, state: ApplicationTurnState) => {
       // if the activity type is not a message, let it continue to process
       // Check if the message is a bot message keyword
       // If it is, let it continue to process without managing state
@@ -471,7 +478,7 @@ export class TeamsAI extends Application<ApplicationTurnState> {
 
     // After the turn has finished, release the lease for the conversation blob
     // In order for it to be available for the next request from the conversation
-    this.turn(TeamsAI.AfterTurn, async (context: TurnContext, state: ApplicationTurnState) => {
+    this.app.turn(TeamsAI.AfterTurn, async (context: TurnContext, state: ApplicationTurnState) => {
       try {
         if (state.temp.leaseId) {
           // Release the lease for the conversation blob
