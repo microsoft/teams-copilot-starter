@@ -62,7 +62,7 @@ export function configureTeamsAI(
           apiKey: env.data.OPENAI_KEY,
           defaultModel: env.data.OPENAI_MODEL,
           endpoint: env.data.OPENAI_ENDPOINT,
-          },
+        },
         logger
       );
       break;
