@@ -42,6 +42,8 @@ export function configureTeamsAI(
       model = new OpenAIModel({
         apiKey: env.data.OPENAI_KEY,
         defaultModel: env.data.OPENAI_MODEL,
+        retryPolicy: [2000, 3000, 4000],
+        responseFormat: { type: "json_object" },
       });
       break;
     case OpenAIType.Enum.AzureOpenAI:
@@ -50,6 +52,8 @@ export function configureTeamsAI(
         azureDefaultDeployment: env.data.OPENAI_MODEL,
         azureEndpoint: env.data.OPENAI_ENDPOINT,
         azureApiVersion: env.data.OPENAI_API_VERSION,
+        retryPolicy: [2000, 3000, 4000],
+        responseFormat: { type: "json_object" },
       });
       break;
     case OpenAIType.Enum.CustomAI:
@@ -58,7 +62,7 @@ export function configureTeamsAI(
           apiKey: env.data.OPENAI_KEY,
           defaultModel: env.data.OPENAI_MODEL,
           endpoint: env.data.OPENAI_ENDPOINT,
-        },
+          },
         logger
       );
       break;
