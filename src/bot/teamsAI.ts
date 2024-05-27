@@ -190,27 +190,19 @@ export class TeamsAI {
             type: "TextBlock",
             text: `Your are now signed in as: ${context.activity.from.name}`
           },
-          {
-            type: "TextBlock",
-            text: "Click the button below to continue your conversation."
-          }
         ],
-        actions: [
-          {
-            "type": "Action.Submit",
-            "title": `"${context.activity.text}"`,
-            "data": {
-              "msteams": {
-                  "type": "imBack",
-                  "value": `${context.activity.text}`
-              }
-            }
-          }
-        ]
       };
     
       const adaptiveCard = CardFactory.adaptiveCard(card);
-      await context.sendActivity({ attachments: [adaptiveCard] });      
+      await context.sendActivity({ attachments: [adaptiveCard] }); 
+      
+      // Echo back users request
+      if (context.activity.channelData.source.name === "message"
+        && context.activity.text.length > 0) {
+          context.activity.type = ActivityTypes.Message;
+          state.deleteConversationState();
+          await this.app.run(context);
+        } 
     });
   
     this.app.authentication
