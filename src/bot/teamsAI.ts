@@ -53,7 +53,8 @@ import {
   flaggedOutputAction,
   unknownAction,
   webRetrieval,
-  getMyInformation
+  getMyInformation,
+  getCompanyStockQuote
 } from "../actions";
 import * as functionNames from "../functions/functionNames";
 import {
@@ -122,7 +123,7 @@ export class TeamsAI {
       .withAuthentication(adapter, {
         settings: {
             graph: {
-                scopes: ["User.Read"],
+                scopes: ["api://botid-666788c7-d40a-4a47-88dc-2e99ca25d677/access_as_user"],
                 msalConfig: {
                     auth: {
                         clientId: process.env.AAD_APP_CLIENT_ID!,
@@ -310,6 +311,16 @@ export class TeamsAI {
     this.app.ai.action(
       actionNames.getCompanyDetails, 
       async (context: TurnContext, state: ApplicationTurnState, parameters: ChatParameters) => getCompanyDetails(context, state, parameters, this.planner));
+
+    /******************************************************************
+     * ACTION: Get Company Quote
+     * Register a handler to handle the "getCompanyStockQuote" action
+     * This action is used to get the address of a company
+     * 
+    *****************************************************************/
+      this.app.ai.action(
+        actionNames.getCompanyStockQuote,
+        async (context: TurnContext, state: ApplicationTurnState, parameters: ChatParameters) => getCompanyStockQuote(context, state, parameters, this.planner));  
 
     /******************************************************************
      * ACTION: CHAT WITH YOUR OWN DATA

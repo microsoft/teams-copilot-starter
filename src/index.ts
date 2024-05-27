@@ -6,8 +6,6 @@ import * as path from "path";
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
-  CloudAdapter,
-  ConfigurationBotFrameworkAuthentication,
   ConfigurationServiceClientCredentialFactory,
   MemoryStorage,
   TurnContext,
@@ -19,11 +17,11 @@ import { logging } from "./telemetry/loggerManager";
 import { configureTeamsAI } from "./configTeamsAI";
 import { addResponseFormatter } from "./responseFormatter";
 import { Env } from "./env";
-import { BlobsStorage } from "botbuilder-azure-blobs";
 import { ConsoleLogger } from "./telemetry/consoleLogger";
 import { AppInsightLogger } from "./telemetry/appInsightLogger";
 import { BlobsStorageLeaseManager } from "./helpers/blobsStorageLeaseManager";
 import { TeamsAdapter } from "@microsoft/teams-ai";
+import * as jwtValidator from "./services/jwtValidator";
 
 // Create an instance of the environment variables
 const envVariables: Env = new Env();
@@ -148,6 +146,21 @@ server.post("/api/messages", async (req, res) => {
         throw err;
       }
     });
+});
+
+// Listen for incoming requests.
+server.get("/api/data", jwtValidator.validateJwt, async (req, res) => {
+  const responseData = [
+    {
+      name: "Future LLC",
+      quote: "100",
+    },
+    {
+      name: "Tech Corp",
+      quote: "110",
+    },
+  ];
+  res.json(responseData);
 });
 
 server.get(
