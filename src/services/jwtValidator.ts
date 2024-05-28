@@ -1,9 +1,9 @@
-import * as jwt from 'jsonwebtoken';
-import jwksClient from 'jwks-rsa';
+import * as jwt from "jsonwebtoken";
+import jwksClient from "jwks-rsa";
 
 export const validateRole = (role: string) => {
   return async (req: any, res: any, next: any) => {
-    const hasRole: boolean = false;
+    const hasRole = false;
     if (req.user.roles === undefined) return hasRole;
     for (let i = 0; i < req?.user?.roles.length; i++) {
       const currentRole = req.user.roles[i];
@@ -28,7 +28,7 @@ export const validateJwt = (req: any, res: any, next: any): void => {
 
   const getSigningKeys = (header: any, callback: any): void => {
     const client = jwksClient({
-      jwksUri: DISCOVERY_KEYS_ENDPOINT
+      jwksUri: DISCOVERY_KEYS_ENDPOINT,
     });
 
     client.getSigningKey(header.kid, function (err, key: any) {
@@ -41,7 +41,7 @@ export const validateJwt = (req: any, res: any, next: any): void => {
 
   const authHeader = req.headers.authorization;
   if (authHeader !== undefined) {
-    const token = authHeader.split(' ')[1];
+    const token = authHeader.split(" ")[1];
     const validationOptions = {
       audience, // v2.0 token, ensure to set accessTokenAcceptedVersion: 2, in app registration manifest
     };

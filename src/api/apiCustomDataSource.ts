@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 import customData from "../resources/customDataSource.json";
 import CompanyInfo from "../models/companyInfo";
-import CompanyAddress from "../models/companyAddress";
 
 /**
  * This an example of getting data from a custom data source.

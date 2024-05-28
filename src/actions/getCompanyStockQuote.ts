@@ -1,8 +1,7 @@
 import { CardFactory, TurnContext } from "botbuilder";
 import { AI, ActionPlanner } from "@microsoft/teams-ai";
 import { ApplicationTurnState, ChatParameters } from "../models/aiTypes";
-import { Client } from "@microsoft/microsoft-graph-client";
-import { apiCustomDataService } from "../api/apiCustomDataSource";
+import customData from "../resources/customDataSource.json";
 import axios from "axios";
 
 /**
@@ -17,10 +16,22 @@ export async function getCompanyStockQuote(
   parameters: ChatParameters,
   planner: ActionPlanner<ApplicationTurnState>
 ): Promise<string> {
-  const companyName = parameters.entity.toLowerCase();
+  const companyName = parameters.entity;
 
+  // Get the company from the custom data source.
+  const company = customData.find(
+    (c) => c.name.toLowerCase() === companyName.toLowerCase()
+  );
+  if (!company) {
+    await context.sendActivity("Company not found.");
+    return AI.StopCommandName;
+  }
+
+  // Get the company stock quote.
   try {
-    const url = `https://${process.env.BOT_DOMAIN}/api/data`;
+    // Call the API to get the company stock quote.
+    // The API requires an access token to be passed in the Authorization header.
+    const url = `https://${process.env.BOT_DOMAIN}/api/quotes/${company?.ticker}`;
     const accessToken = state.temp.authTokens["graph"];
 
     const response = await axios.get(url, {
@@ -30,12 +41,8 @@ export async function getCompanyStockQuote(
     });
 
     const data = response.data;
-    const company = data.find(
-      (company: { name: string; quote: string }) =>
-        company.name.toLowerCase() === companyName
-    );
-    if (!company) {
-      await context.sendActivity("Quote not found.");
+    if (!data) {
+      await context.sendActivity("Ticker not found.");
       return AI.StopCommandName;
     }
 
@@ -46,15 +53,32 @@ export async function getCompanyStockQuote(
         {
           type: "TextBlock",
           text: `Company: ${company.name}`,
-          size: "Medium",
+          size: "Large",
           weight: "Bolder",
+          style: "heading",
         },
         {
           type: "TextBlock",
-          text: `Quote: ${company.quote}`,
-          size: "Medium",
-          weight: "Bolder",
-        }
+          text: `Country: ${company.worldRegion}`,
+          size: "Large",
+        },
+        {
+          type: "FactSet",
+          facts: [
+            {
+              title: "Time:",
+              value: `${new Date().toLocaleString()}`,
+            },
+            {
+              title: "Ticker:",
+              value: `${data.ticker}`,
+            },
+            {
+              title: "Quote:",
+              value: `$${data.quote}`,
+            },
+          ],
+        },
       ],
     };
 

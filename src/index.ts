@@ -22,6 +22,7 @@ import { AppInsightLogger } from "./telemetry/appInsightLogger";
 import { BlobsStorageLeaseManager } from "./helpers/blobsStorageLeaseManager";
 import { TeamsAdapter } from "@microsoft/teams-ai";
 import * as jwtValidator from "./services/jwtValidator";
+import { getTickerQuote } from "./api/apiTicker";
 
 // Create an instance of the environment variables
 const envVariables: Env = new Env();
@@ -148,20 +149,10 @@ server.post("/api/messages", async (req, res) => {
     });
 });
 
-// Listen for incoming requests.
-server.get("/api/data", jwtValidator.validateJwt, async (req, res) => {
-  const responseData = [
-    {
-      name: "Future LLC",
-      quote: "100",
-    },
-    {
-      name: "Tech Corp",
-      quote: "110",
-    },
-  ];
-  res.json(responseData);
-});
+// Listen for incoming requests to get Ticker.
+// This is a sample API that returns a random quote for a given ticker symbol.
+// The API is protected by a JWT token. The token is validated by the jwtValidator middleware.
+server.get("/api/quotes/:ticker", jwtValidator.validateJwt, getTickerQuote);
 
 server.get(
   "/auth-:name(start|end).html",
