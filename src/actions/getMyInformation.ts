@@ -13,7 +13,6 @@ export async function getMyInformation(
   context: TurnContext,
   state: ApplicationTurnState
 ): Promise<string> {
-
   // This is not yet implemented as it requires a token for Graph
   context.sendActivity("This feature is not yet implemented.");
   return AI.StopCommandName;
