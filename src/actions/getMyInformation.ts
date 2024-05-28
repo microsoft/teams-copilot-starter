@@ -14,9 +14,10 @@ export async function getMyInformation(
   state: ApplicationTurnState
 ): Promise<string> {
   // This is not yet implemented as it requires a token for Graph
-  context.sendActivity("This feature is not yet implemented.");
+  await context.sendActivity("This feature is not yet implemented.");
   return AI.StopCommandName;
 
+  // Below is the code that would be used to get the user's information from Graph
   // const client = await getGraphClient(context, state);
   // if (!client) {
   //   return AI.StopCommandName;
