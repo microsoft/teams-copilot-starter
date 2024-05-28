@@ -18,7 +18,7 @@ export const validateRole = (role: string) => {
 export const validateJwt = (req: any, res: any, next: any): void => {
   if (
     process.env.AAD_APP_CLIENT_ID === undefined ||
-    process.env.AAD_APP_CLIENT_ID === undefined
+    process.env.AAD_APP_TENANT_ID === undefined
   ) {
     return res.send(500);
   }

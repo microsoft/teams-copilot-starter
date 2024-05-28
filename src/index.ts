@@ -137,7 +137,7 @@ server.post("/api/messages", async (req, res) => {
   await adapter
     .process(req, res, async (context) => {
       // If the bot is not running, start it.
-      // await bot.start(context);
+      await bot.start(context);
       // Run the bot's message processing pipeline.
       await bot.app.run(context);
     })
