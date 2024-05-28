@@ -13,44 +13,49 @@ export async function getMyInformation(
   context: TurnContext,
   state: ApplicationTurnState
 ): Promise<string> {
-  const client = await getGraphClient(context, state);
-  if (!client) {
-    return AI.StopCommandName;
-  }
 
-  const user = await client.api("/me").get();
-  const card = {
-    type: "AdaptiveCard",
-    version: "1.0",
-    body: [
-      {
-        type: "TextBlock",
-        text: `Name: ${user.displayName}`,
-        size: "Medium",
-        weight: "Bolder",
-      },
-      {
-        type: "TextBlock",
-        text: `Job Title: ${user.jobTitle}`,
-      },
-      {
-        type: "TextBlock",
-        text: `Email: ${user.mail}`,
-      },
-      {
-        type: "TextBlock",
-        text: `Business Phone: ${user.businessPhones[0]}`,
-      },
-      {
-        type: "TextBlock",
-        text: `Email: ${user.mail}`,
-      },
-    ],
-  };
-
-  const adaptiveCard = CardFactory.adaptiveCard(card);
-  await context.sendActivity({ attachments: [adaptiveCard] });
+  // This is not yet implemented as it requires a token for Graph
+  context.sendActivity("This feature is not yet implemented.");
   return AI.StopCommandName;
+
+  // const client = await getGraphClient(context, state);
+  // if (!client) {
+  //   return AI.StopCommandName;
+  // }
+
+  // const user = await client.api("/me").get();
+  // const card = {
+  //   type: "AdaptiveCard",
+  //   version: "1.0",
+  //   body: [
+  //     {
+  //       type: "TextBlock",
+  //       text: `Name: ${user.displayName}`,
+  //       size: "Medium",
+  //       weight: "Bolder",
+  //     },
+  //     {
+  //       type: "TextBlock",
+  //       text: `Job Title: ${user.jobTitle}`,
+  //     },
+  //     {
+  //       type: "TextBlock",
+  //       text: `Email: ${user.mail}`,
+  //     },
+  //     {
+  //       type: "TextBlock",
+  //       text: `Business Phone: ${user.businessPhones[0]}`,
+  //     },
+  //     {
+  //       type: "TextBlock",
+  //       text: `Email: ${user.mail}`,
+  //     },
+  //   ],
+  // };
+
+  // const adaptiveCard = CardFactory.adaptiveCard(card);
+  // await context.sendActivity({ attachments: [adaptiveCard] });
+  // return AI.StopCommandName;
 }
 
 async function getGraphClient(

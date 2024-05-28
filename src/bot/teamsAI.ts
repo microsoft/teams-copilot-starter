@@ -123,7 +123,7 @@ export class TeamsAI {
       .withAuthentication(adapter, {
         settings: {
             graph: {
-                scopes: ["api://botid-666788c7-d40a-4a47-88dc-2e99ca25d677/access_as_user"],
+                scopes: [`api://botid-${process.env.BOT_ID}/access_as_user`],
                 msalConfig: {
                     auth: {
                         clientId: process.env.AAD_APP_CLIENT_ID!,
