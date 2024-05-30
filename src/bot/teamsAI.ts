@@ -134,7 +134,7 @@ export class TeamsAI {
                 endOnInvalidMessage: true
             }
         },
-        autoSignIn: true
+        autoSignIn: true,
       })
       .build();
     return ai;
@@ -218,14 +218,14 @@ export class TeamsAI {
     });
 
     this.app.message("/signout", async (context: TurnContext, state: ApplicationTurnState) => {
-      await this.app.authentication.signOutUser(context, state);
+      await this.app.authentication.signOutUser(context, state, this.authConnectionName);
   
       // Echo back users request
       await context.sendActivity("You have signed out");
     });
 
     this.app.message("/signin", async (context: TurnContext, state: ApplicationTurnState) => {
-      const response = await this.app.authentication.signUserIn(context, state);
+      const response = await this.app.authentication.signUserIn(context, state, this.authConnectionName);
   
       // Echo back users request
       await context.sendActivity("Sign in request sent");

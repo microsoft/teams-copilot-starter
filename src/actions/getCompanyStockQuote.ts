@@ -30,12 +30,20 @@ export async function getCompanyStockQuote(
     return AI.StopCommandName;
   }
 
+  const accessToken = state.temp.authTokens
+    ? state.temp.authTokens["graph"]
+    : undefined;
+
+  if (!accessToken) {
+    await context.sendActivity("Please sign in to get the stock quote.");
+    return AI.StopCommandName;
+  }
+
   // Get the company stock quote.
   try {
     // Call the API to get the company stock quote.
     // The API requires an access token to be passed in the Authorization header.
     const url = `https://${env.data.BOT_DOMAIN}/api/quotes/${company?.ticker}`;
-    const accessToken = state.temp.authTokens["graph"];
 
     const response = await axios.get(url, {
       headers: {

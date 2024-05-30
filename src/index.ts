@@ -23,6 +23,7 @@ import { BlobsStorageLeaseManager } from "./helpers/blobsStorageLeaseManager";
 import { TeamsAdapter } from "@microsoft/teams-ai";
 import * as jwtValidator from "./services/jwtValidator";
 import { getTickerQuote } from "./api/apiTicker";
+import { BlobsStorage } from "botbuilder-azure-blobs";
 
 // Create an instance of the environment variables
 const envVariables: Env = new Env();
