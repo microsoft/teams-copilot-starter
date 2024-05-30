@@ -53,7 +53,6 @@ import {
   flaggedOutputAction,
   unknownAction,
   webRetrieval,
-  getMyInformation,
   getCompanyStockQuote
 } from "../actions";
 import * as functionNames from "../functions/functionNames";
@@ -123,15 +122,15 @@ export class TeamsAI {
       .withAuthentication(adapter, {
         settings: {
             graph: {
-                scopes: [`api://botid-${process.env.BOT_ID}/access_as_user`],
+                scopes: [`api://botid-${this.env.data.BOT_ID}/access_as_user`],
                 msalConfig: {
                     auth: {
-                        clientId: process.env.AAD_APP_CLIENT_ID!,
-                        clientSecret: process.env.AAD_APP_CLIENT_SECRET!,
-                        authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/${process.env.AAD_APP_TENANT_ID}`
+                        clientId: this.env.data.AAD_APP_CLIENT_ID!,
+                        clientSecret: this.env.data.AAD_APP_CLIENT_SECRET!,
+                        authority: `${this.env.data.AAD_APP_OAUTH_AUTHORITY_HOST}/${this.env.data.AAD_APP_TENANT_ID}`
                     }
                 },
-                signInLink: `https://${process.env.BOT_DOMAIN}/auth-start.html`,
+                signInLink: `https://${this.env.data.BOT_DOMAIN}/auth-start.html`,
                 endOnInvalidMessage: true
             }
         },
@@ -154,16 +153,18 @@ export class TeamsAI {
     storage: Storage,
     planner: ActionPlanner<ApplicationTurnState>
   ) {
+    // Create the environment variables
+    this.env = container.resolve<Env>(Env);
+
     // Create the AI application
     this.app = this.configureAI(botAppId, adapter, storage, planner);    
     this.planner = planner;
-
     this.logger = logging.getLogger("bot.TeamsAI");
     // Register this.logger singleton, if it is not registered
     if (!container.isRegistered(Logger))
       container.register(Logger, { useValue: this.logger });
 
-    this.env = container.resolve<Env>(Env);
+    // Register the BlobsStorageLeaseManager singleton, if it is not registered
     this.stateStorageManager = container.resolve<BlobsStorageLeaseManager>(BlobsStorageLeaseManager);
 
     // Create a local Vectra index
@@ -208,10 +209,12 @@ export class TeamsAI {
   
     this.app.authentication
       .get(this.authConnectionName)
-      .onUserSignInFailure(async (context: TurnContext, _state: ApplicationTurnState, error: AuthError) => {
+      .onUserSignInFailure(async (context: TurnContext, state: ApplicationTurnState, error: AuthError) => {
           // Failed to login
           await context.sendActivity("Failed to login");
-          await context.sendActivity(`Error message: ${error.message}`);
+          if (state.conversation.debug ?? false) {
+            await context.sendActivity(`Error message: ${error.message}`);
+          }
     });
 
     this.app.message("/signout", async (context: TurnContext, state: ApplicationTurnState) => {
@@ -343,13 +346,6 @@ export class TeamsAI {
      *****************************************************************/
     // Define a prompt action when the user sends a message containing the "forgetDocuments" action
     this.app.ai.action(actionNames.forgetDocuments, forgetDocuments);
-
-    /******************************************************************
-     * ACTION: Get Information about me from Graph
-     *****************************************************************/
-    // Define a prompt action when the user sends a message containing the "getMyINformation" action
-    this.app.ai.action(actionNames.getMyInformation, getMyInformation);
-
 
     /******************************************************************
      * ADAPTIVE CARD ACTIONS: GetCompanyDetails

@@ -3,6 +3,9 @@ import { AI, ActionPlanner } from "@microsoft/teams-ai";
 import { ApplicationTurnState, ChatParameters } from "../models/aiTypes";
 import customData from "../resources/customDataSource.json";
 import axios from "axios";
+import { container } from "tsyringe";
+import { Env } from "../env";
+
 
 /**
  * Enables debug mode for the conversation.
@@ -16,6 +19,7 @@ export async function getCompanyStockQuote(
   parameters: ChatParameters,
   planner: ActionPlanner<ApplicationTurnState>
 ): Promise<string> {
+  const env = container.resolve<Env>(Env);
   const companyName = parameters.entity;
 
   // Get the company from the custom data source.
@@ -31,7 +35,7 @@ export async function getCompanyStockQuote(
   try {
     // Call the API to get the company stock quote.
     // The API requires an access token to be passed in the Authorization header.
-    const url = `https://${process.env.BOT_DOMAIN}/api/quotes/${company?.ticker}`;
+    const url = `https://${env.data.BOT_DOMAIN}/api/quotes/${company?.ticker}`;
     const accessToken = state.temp.authTokens["graph"];
 
     const response = await axios.get(url, {
@@ -87,7 +91,7 @@ export async function getCompanyStockQuote(
     return AI.StopCommandName;
   } catch (error) {
     await context.sendActivity(
-      "An error occurred while getting the company address."
+      `An error occurred while getting the stock ticker for ${companyName}.`
     );
     return AI.StopCommandName;
   }

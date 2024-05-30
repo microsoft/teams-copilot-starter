@@ -52,9 +52,9 @@ container.register<Env>(Env, {
 const adapter = new TeamsAdapter(
   {},
   new ConfigurationServiceClientCredentialFactory({
-    MicrosoftAppId: process.env.BOT_ID,
-    MicrosoftAppPassword: process.env.BOT_PASSWORD,
-    MicrosoftAppType: "MultiTenant",
+    MicrosoftAppId: envVariables.data.BOT_ID,
+    MicrosoftAppPassword: envVariables.data.BOT_PASSWORD,
+    MicrosoftAppType: envVariables.data.BOT_APP_TYPE,
   })
 );
 

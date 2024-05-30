@@ -7,7 +7,6 @@ export const forgetDocuments = "forgetDocuments";
 export const getCompanyDetails = "getCompanyDetails";
 export const getCompanyInfo = "getCompanyInfo";
 export const webRetrieval = "webRetrieval";
-export const getMyInformation = "getMyInformation";
 export const getCompanyStockQuote = "getCompanyStockQuote";
 
 export const flaggedInputAction = AI.FlaggedInputActionName;

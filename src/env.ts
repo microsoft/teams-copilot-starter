@@ -99,7 +99,7 @@ class Env {
   private botIDRefiner = (data: any, ctx: RefinementCtx) => {
     // based on the TeamsFX environment, set the BOT_ID and BOT_PASSWORD
     let isValid = true;
-    // Check the presence of BOT_ID and BOT_PASSWORD when not using TeamsFX Test Toolkit
+    // Check the presence of BOT_ID, BOT_PASSWORD and BOT_DOMAIN when not using TeamsFX Test Toolkit
     if (data.TEAMSFX_ENV !== "testtool") {
       if ((data.BOT_ID?.length ?? 0) === 0) {
         ctx.addIssue({
@@ -117,6 +117,57 @@ class Env {
         });
         isValid = false;
       }
+      if ((data.BOT_DOMAIN?.length ?? 0) === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "BOT_DOMAIN is required.",
+          path: [data.BOT_DOMAIN],
+        });
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  };
+
+  private authRefiner = (data: any, ctx: RefinementCtx) => {
+    // based on the TeamsFX environment, set the BOT_ID and BOT_PASSWORD
+    let isValid = true;
+    // Check the presence of AAD_APP_CLIENT_ID, AAD_APP_CLIENT_SECRET, AAD_APP_OAUTH_AUTHORITY and AAD_APP_TENANT_ID
+    // when not using TeamsFX Test Toolkit
+    if (data.TEAMSFX_ENV !== "testtool") {
+      if ((data.AAD_APP_CLIENT_ID?.length ?? 0) === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "AAD_APP_CLIENT_ID is required.",
+          path: [data.AAD_APP_CLIENT_ID],
+        });
+        isValid = false;
+      }
+      if ((data.AAD_APP_CLIENT_SECRET?.length ?? 0) === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "AAD_APP_CLIENT_SECRET is required.",
+          path: [data.AAD_APP_CLIENT_SECRET],
+        });
+        isValid = false;
+      }
+      if ((data.AAD_APP_OAUTH_AUTHORITY?.length ?? 0) === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "AAD_APP_OAUTH_AUTHORITY is required.",
+          path: [data.AAD_APP_OAUTH_AUTHORITY],
+        });
+        isValid = false;
+      }
+      if ((data.AAD_APP_TENANT_ID?.length ?? 0) === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "AAD_APP_TENANT_ID is required.",
+          path: [data.AAD_APP_TENANT_ID],
+        });
+        isValid = false;
+      }
     }
 
     return isValid;
@@ -128,6 +179,10 @@ class Env {
 
   private schema = z
     .object({
+      AAD_APP_CLIENT_ID: z.string().optional(),
+      AAD_APP_CLIENT_SECRET: z.string().optional(),
+      AAD_APP_OAUTH_AUTHORITY_HOST: z.string().optional(),
+      AAD_APP_TENANT_ID: z.string().optional(),
       TEAMSFX_ENV: z.string().min(1),
       APP_VERSION: z.string().min(1),
       BOT_ID: z.string().optional(),
@@ -135,6 +190,7 @@ class Env {
       BOT_APP_TYPE: z
         .enum(["UserAssignedMsi", "SingleTenant", "MultiTenant"])
         .optional(),
+      BOT_DOMAIN: z.string().optional(),
       OPENAI_KEY: z.string().min(1),
       OPENAI_ENDPOINT: z.string().url(),
       OPENAI_MODEL: z.string().min(1), // For Azure OpenAI this is the name of the deployment to use.
