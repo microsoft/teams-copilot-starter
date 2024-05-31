@@ -114,6 +114,7 @@ export class TeamsAI {
       .withAIOptions({
         planner: planner,
         allow_looping: false, // set false for sequence augmentation to prevent sending the return value of the last action to the AI.run method
+        enable_feedback_loop: true, // enables the user feedback functionality
       })
       .build();
     return ai;
