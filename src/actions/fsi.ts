@@ -114,7 +114,24 @@ export async function getCompanyDetails(
 
   if (card) {
     // Render the Adaptive Card based on the retrieved company details
-    await context.sendActivity({ attachments: [card] });
+    await context.sendActivity({
+      attachments: [card],
+      channelData: { feedbackLoopEnabled: true },
+      entities: [
+        {
+          type: "https://schema.org/Message",
+          "@type": "Message",
+          "@context": "https://schema.org",
+          "@id": "",
+          // additionalType: ["AIGeneratedContent"],
+          usageInfo: {
+            name: "Confidential",
+            description:
+              "This message is confidential and intended only for internal use.",
+          },
+        },
+      ],
+    });
   } else {
     // No adaptive card found
     logger.info(`Adaptive card failed to be generated for '${input}'`);

@@ -129,7 +129,27 @@ export async function selectItem(
   const card = Utils.renderAdaptiveCard(companyListCard, entity);
 
   if (context.activity.conversation.conversationType === "personal") {
-    await context.sendActivity({ attachments: card ? [card] : [] });
+    if (card) {
+      await context.sendActivity({
+        attachments: [card],
+        channelData: { feedbackLoopEnabled: true },
+        entities: [
+          {
+            type: "https://schema.org/Message",
+            "@type": "Message",
+            "@context": "http://schema.org",
+            "@id": "",
+            usageInfo: {
+              name: "Confidential",
+              description:
+                "This message is confidential and intended only for internal use.",
+            },
+          },
+        ],
+      });
+    } else {
+      await context.sendActivity("No company information found.");
+    }
   } else {
     return {
       attachmentLayout: "list",

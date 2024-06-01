@@ -10,6 +10,9 @@ import {
   Memory,
   TeamsAdapter,
   ApplicationBuilder,
+  FeedbackLoopData,
+  PredictedSayCommand,
+  AI,
 } from "@microsoft/teams-ai";
 import {
   ActivityTypes,
@@ -50,7 +53,8 @@ import {
   flaggedInputAction,
   flaggedOutputAction,
   unknownAction,
-  webRetrieval
+  webRetrieval,
+  formatterAction
 } from "../actions";
 import * as functionNames from "../functions/functionNames";
 import {
@@ -175,6 +179,9 @@ export class TeamsAI {
     this.app.ai.action(actionNames.flaggedInputAction, flaggedInputAction);
     this.app.ai.action(actionNames.flaggedOutputAction, flaggedOutputAction);
 
+    // Register a handler to override the say command with custom logic
+    this.app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, formatterAction);
+
     /**********************************************************************
      * FUNCTION: GET ACTIONS
      * Register a handler to handle the "getActions" semantic function
@@ -257,6 +264,31 @@ export class TeamsAI {
     this.app.ai.action(actionNames.forgetDocuments, forgetDocuments);
 
     /******************************************************************
+     * USER FEEDBACK LOOP
+     *****************************************************************/
+    this.app.feedbackLoop(async (context: TurnContext, state: ApplicationTurnState, feedback: FeedbackLoopData) => {
+      // Log the feedback
+      this.logger.info(`Feedback received: ${JSON.stringify(feedback)}`);
+      await context.sendActivity("Thank you for your feedback.");
+      if (state.conversation.debug) {
+        await context.sendActivity(`Feedback received: ${JSON.stringify(feedback)}`);
+      }
+    });
+
+    /******************************************************************
+     * HANDOFF
+     *****************************************************************/
+    // Register a handler to handle the handoff action
+    this.app.handoff(async (context: TurnContext, state: ApplicationTurnState, continuation: string) => {
+      // Log the handoff
+      this.logger.info(`Handoff received: ${continuation}`);
+      await context.sendActivity("Continuing the conversation started with M365 Copilot.");
+      if (state.conversation.debug) {
+        await context.sendActivity(`Handoff received: ${continuation}`);
+      }
+    });
+
+    /******************************************************************
      * ADAPTIVE CARD ACTIONS: GetCompanyDetails
      *****************************************************************/
     this.app.adaptiveCards.actionExecute(
@@ -277,6 +309,7 @@ export class TeamsAI {
     // Listen for message extension select item command
     this.app.messageExtensions.selectItem(selectItem);
 
+    // Task Module handler
     this.app.taskModules.fetch(
       actionNames.getCompanyInfo,
       async (

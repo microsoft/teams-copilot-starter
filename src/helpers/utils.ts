@@ -385,6 +385,43 @@ export class Utils {
   }
 
   /**
+   * Extract snippets from the response content limited to the given length.
+   * @param {string} content The content to extract snippets from.
+   * @param {number} length The maximum length of the snippets.
+   * @returns {string} The extracted snippets.
+   */
+  static extractSnippet(content: string, length: number): string {
+    const snippets = content.split("\n").filter((line) => line.length > 0);
+    let snippet = "";
+    let remaining = length;
+    for (const line of snippets) {
+      if (line.length < remaining) {
+        snippet += line + "\n";
+        remaining -= line.length + 1;
+      } else {
+        snippet += line.substring(0, remaining) + "\n";
+        break;
+      }
+    }
+    return snippet;
+  }
+
+  /**
+   * Format the response content so that the sources are numbered instead of [doc1].
+   * @param {string} content The content to format.
+   * @returns {string} The formatted content.
+   */
+  static formatCitationsResponse(content: string): string {
+    const regex = /\[doc(\d+)\]/g;
+    let match;
+    let index = 1;
+    while ((match = regex.exec(content)) !== null) {
+      content = content.replace(match[0], `[${index++}]`);
+    }
+    return content;
+  }
+
+  /**
    * Manually start a timer to periodically send "typing" activities.
    * @remarks
    * The timer waits 1000ms to send its initial "typing" activity and then send an additional

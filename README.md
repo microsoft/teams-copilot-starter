@@ -83,8 +83,8 @@ See [Skill Customization Guide](./docs/concepts/skill-customization.md) and [Act
 - [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teamsfx-cli)
 - An [Azure subscription](https://azure.microsoft.com/) to host the required Azure resources.
 - An Azure OpenAI Service with the following model deployments (refer to the [Azure OpenAI Service documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) for model availability by region):
-  - The Azure OpenAI Service has a model deployed with deployment name `gpt-4` and model name `gpt-4`
-  - The Azure OpenAI Service has a model deployed with deployment name `text-embedding` and model name `text-embedding-ada-002`
+  - The Azure OpenAI Service has a model deployed with deployment name `gpt-4o` and model name `gpt-4o`
+  - The Azure OpenAI Service has a model deployed with deployment name `text-embedding` and model name `text-embedding-3-large`
 - A storage account in your Azure Subscription
 
 ## Setting up the sample
