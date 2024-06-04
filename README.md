@@ -77,6 +77,8 @@ To enable Single Sign-on with authorized access to a secured API the following c
 1. In /src/index.ts, comment the lines 68-72 that defined the storage as BlobStorage. Uncomment the line 75 to define the MemoryStorage
 1. In /src/bot/teamsAI.ts, in line 137 set the autoSignIn to true. This will allow Single Sign-in to start of every message.
 
+For more information see: [Enable SSO](./docs/concepts/enable-sso.md).
+
 ## Customization
 
 See [Skill Customization Guide](./docs/concepts/skill-customization.md) and [Action Customization Guide](./docs/concepts/action-customization.md) to explore all the ways to customize this starter project based on specific requirements such as adding new semantic skills and actions, external data sources, adaptive cards, and more.
