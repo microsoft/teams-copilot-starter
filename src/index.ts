@@ -6,9 +6,8 @@ import * as path from "path";
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
-  CloudAdapter,
-  ConfigurationBotFrameworkAuthentication,
   ConfigurationServiceClientCredentialFactory,
+  MemoryStorage,
   TurnContext,
 } from "botbuilder";
 
@@ -18,11 +17,13 @@ import { logging } from "./telemetry/loggerManager";
 import { configureTeamsAI } from "./configTeamsAI";
 import { addResponseFormatter } from "./responseFormatter";
 import { Env } from "./env";
-import { BlobsStorage } from "botbuilder-azure-blobs";
 import { ConsoleLogger } from "./telemetry/consoleLogger";
 import { AppInsightLogger } from "./telemetry/appInsightLogger";
 import { BlobsStorageLeaseManager } from "./helpers/blobsStorageLeaseManager";
 import { TeamsAdapter } from "@microsoft/teams-ai";
+import * as jwtValidator from "./services/jwtValidator";
+import { getTickerQuote } from "./api/apiTicker";
+import { BlobsStorage } from "botbuilder-azure-blobs";
 
 // Create an instance of the environment variables
 const envVariables: Env = new Env();
@@ -52,17 +53,26 @@ container.register<Env>(Env, {
 const adapter = new TeamsAdapter(
   {},
   new ConfigurationServiceClientCredentialFactory({
-    MicrosoftAppId: process.env.BOT_ID,
-    MicrosoftAppPassword: process.env.BOT_PASSWORD,
-    MicrosoftAppType: "MultiTenant",
+    MicrosoftAppId: envVariables.data.BOT_ID,
+    MicrosoftAppPassword: envVariables.data.BOT_PASSWORD,
+    MicrosoftAppType: envVariables.data.BOT_APP_TYPE,
   })
 );
 
+// Due to bug in teams-ai, sso does not work correctly with BlobsStorage. T
+// The method onUserSignInSuccess in the TeamsAdapter class is not called when using BlobsStorage.
+// Therefore, MemoryStorage is used instead for the SSO use case.
+// See: https://github.com/microsoft/teams-ai/issues/1457
+
+// NOTE: Comment out the following lines (68-72) to use MemoryStorage instead of BlobsStorage to enable SSO for now
 logger.info("Creating BlobsStorage");
 const storage = new BlobsStorage(
   `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
   envVariables.data.STORAGE_CONTAINER_NAME!
 );
+
+// NOTE: Uncomment the following line to use MemoryStorage instead of BlobsStorage to enable SSO for now
+// const storage = new MemoryStorage();
 
 const storageLeaseManager = new BlobsStorageLeaseManager(
   `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
@@ -142,6 +152,11 @@ server.post("/api/messages", async (req, res) => {
       }
     });
 });
+
+// Listen for incoming requests to get Ticker.
+// This is a sample API that returns a random quote for a given ticker symbol.
+// The API is protected by a JWT token. The token is validated by the jwtValidator middleware.
+server.get("/api/quotes/:ticker", jwtValidator.validateJwt, getTickerQuote);
 
 server.get(
   "/auth-:name(start|end).html",

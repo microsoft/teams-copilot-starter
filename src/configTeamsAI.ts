@@ -32,7 +32,7 @@ export function configureTeamsAI(
   logger.info("Configuring Teams AI");
   // Retrieve all configuration settings asynchronously
   logger.info("Retrieving configuration settings for Teams AI");
-  const botAppId = process.env["BOT_ID"]!;
+  const botAppId = env.data.BOT_ID!;
 
   let model: PromptCompletionModel;
 

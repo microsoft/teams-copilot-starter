@@ -26,6 +26,9 @@ The Teams Copilot Starter has a number of functionalities that are accessible vi
 - Support for Azure Open AI, Open AI or custom AI Copilot
 - External Data Sources
 - Customization
+- Single Sign-on with authorized access to a secured API
+
+> **Note:** The Single Sign-on with authorized access to a secured API function is disable by default. This is because by issue on the TeamAI Library that is not yet able to fully use BlobStorage as state in combination with SSO. This is described in issue <https://github.com/microsoft/teams-ai/issues/1457>. To enable SSO see section [Enable Single Sign-on with authorized access to a secured API](#enable-single-sign-on-with-authorized-access-to-a-secured-api).
 
 ### Natural Language Modelling
 
@@ -66,6 +69,15 @@ The Teams Copilot Starter is made to support various AI systems for moderating i
 ### External Data Sources
 
 External data sources allow the injection of relevant information from external sources into prompts, such as vector databases or cognitive search. A vector data source makes it easy to add [RAG](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to any prompt, allowing for better and more accurate replies from the bot. Teams Copilot Starter comes with a built-in local vector database for Node.js, called Vectra. Using Vectra you can chat with either a website content (must be publicly accessible) or locally uploaded documents in either text (TXT) or PDF format. For each data source, a max number of tokens to use can be specified via `maxTokens` variable. For more information see [Vectra](./docs/concepts/vectra.md) guide.
+
+### Enable Single Sign-on with authorized access to a secured API
+
+To enable Single Sign-on with authorized access to a secured API the following code need to be changed
+
+1. In /src/index.ts, comment the lines 68-72 that defined the storage as BlobStorage. Uncomment the line 75 to define the MemoryStorage
+1. In /src/bot/teamsAI.ts, in line 137 set the autoSignIn to true. This will allow Single Sign-in to start of every message.
+
+For more information see: [Enable SSO](./docs/concepts/enable-sso.md).
 
 ## Customization
 
