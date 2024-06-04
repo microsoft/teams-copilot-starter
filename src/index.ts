@@ -59,17 +59,20 @@ const adapter = new TeamsAdapter(
   })
 );
 
-// logger.info("Creating BlobsStorage");
-// const storage = new BlobsStorage(
-//   `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
-//   envVariables.data.STORAGE_CONTAINER_NAME!
-// );
-
 // Due to bug in teams-ai, sso does not work correctly with BlobsStorage. T
 // The method onUserSignInSuccess in the TeamsAdapter class is not called when using BlobsStorage.
-// Therefore, we are using MemoryStorage instead.
+// Therefore, MemoryStorage is used instead for the SSO use case.
 // See: https://github.com/microsoft/teams-ai/issues/1457
-const storage = new MemoryStorage();
+
+// NOTE: Comment out the following lines (68-72) to use MemoryStorage instead of BlobsStorage to enable SSO for now
+logger.info("Creating BlobsStorage");
+const storage = new BlobsStorage(
+  `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
+  envVariables.data.STORAGE_CONTAINER_NAME!
+);
+
+// NOTE: Uncomment the following line to use MemoryStorage instead of BlobsStorage to enable SSO for now
+// const storage = new MemoryStorage();
 
 const storageLeaseManager = new BlobsStorageLeaseManager(
   `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,

@@ -134,7 +134,7 @@ export class TeamsAI {
                 endOnInvalidMessage: true
             }
         },
-        autoSignIn: true,
+        autoSignIn: false, // NOTE: Set to true to enable Single Sign On scenario.
       })
       .build();
     return ai;

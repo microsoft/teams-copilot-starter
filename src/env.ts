@@ -152,11 +152,11 @@ class Env {
         });
         isValid = false;
       }
-      if ((data.AAD_APP_OAUTH_AUTHORITY?.length ?? 0) === 0) {
+      if ((data.AAD_APP_OAUTH_AUTHORITY_HOST?.length ?? 0) === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "AAD_APP_OAUTH_AUTHORITY is required.",
-          path: [data.AAD_APP_OAUTH_AUTHORITY],
+          message: "AAD_APP_OAUTH_AUTHORITY_HOST is required.",
+          path: [data.AAD_APP_OAUTH_AUTHORITY_HOST],
         });
         isValid = false;
       }
@@ -212,7 +212,8 @@ class Env {
       MAX_PAGES: z.coerce.number().int().positive(),
     })
     .superRefine(this.openAIRefiner)
-    .superRefine(this.botIDRefiner);
+    .superRefine(this.botIDRefiner)
+    .superRefine(this.authRefiner);
 
   public data: z.infer<typeof this.schema> = {} as z.infer<typeof this.schema>;
 }
