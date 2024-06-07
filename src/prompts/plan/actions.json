@@ -23,6 +23,20 @@
     }
   },
   {
+    "name": "getCompanyStockQuote",
+    "description": "Retrieves the current stock quote of inquired company",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "type": "string",
+          "description": "The company name for which the quote is being retrieved"
+        }
+      },
+      "required": ["entity"]
+    }
+  },
+  {
     "name": "getCompanyDetails",
     "description": "Gets the details about the specified company",
     "canRunWith": ["getCompanyInfo"],
