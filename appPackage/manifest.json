@@ -3,7 +3,7 @@
     "manifestVersion": "1.16",
     "version": "${{APP_VERSION}}",
     "id": "${{TEAMS_APP_ID}}",
-    "packageName": "com.microsoft.teams.extension",
+    "packageName": "com.microsoft.teams.extension.teamscopilotstarter",
     "developer": {
         "name": "Microsoft Corporation",
         "websiteUrl": "https://www.microsoft.com",
@@ -33,7 +33,33 @@
             ],
             "supportsFiles": true,
             "isNotificationOnly": false,
-            "commandLists": []
+            "commandLists": [
+                {
+                    "scopes": [
+                        "personal",
+                        "team",
+                        "groupchat"
+                    ],
+                    "commands": [
+                        {
+                            "title": "Help",
+                            "description": "Get help with using Teams Copilot Starter"
+                        },
+                        {
+                            "title": "Company Info",
+                            "description": "Get company information"
+                        },
+                        {
+                            "title": "Company Details",
+                            "description": "Get detailed information about a company"
+                        },
+                        {
+                            "title": "Analyze document",
+                            "description": "Analyze document content"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "composeExtensions": [
@@ -53,12 +79,12 @@
                       "commandBox"
                   ],
                   "parameters": [
-                      {
-                      "name": "queryText",
-                      "title": "Query",
-                      "description": "Type in any company name",
-                      "inputType": "text"
-                      }
+                    {
+                        "name": "companyName",
+                        "title": "Company name",
+                        "description": "Enter a company name here",
+                        "inputType": "text"
+                    }
                   ]
                 }
             ]

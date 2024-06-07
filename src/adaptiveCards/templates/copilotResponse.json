@@ -54,61 +54,6 @@
             "separator": true,
             "spacing": "Medium",
             "verticalContentAlignment": "Center"
-        },
-        {
-            "type": "Container",
-            "separator": true,
-            "style": "default",
-            "items": [
-                {
-                    "type": "ColumnSet",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "width": "80px",
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "text": "Citations:",
-                                    "spacing": "None"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "$data": "${prompt.citations}",
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "text": "[${text}](${source_url})"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "type": "Container",
-                    "separator": true,
-                    "style": "default",
-                    "items": [
-                        {
-                            "type": "ActionSet",
-                            "actions": [
-                                {
-                                    "type": "Action.OpenUrl",
-                                    "title": "Meet Copilot",
-                                    "url": "https://github.com/microsoft/teams-copilot-starter",
-                                    "style": "positive"
-                                }
-                            ],
-                            "horizontalAlignment": "Right",
-                            "spacing": "Medium"
-                        }
-                    ],
-                    "horizontalAlignment": "Right"
-                }
-            ]
         }
     ],
     "msteams": {

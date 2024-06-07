@@ -5,7 +5,6 @@ import { ChatGPTSkill, EntityRecognitionSkill } from "../../skills";
 import { Utils } from "../../helpers/utils";
 import { logging } from "../../telemetry/loggerManager";
 import * as responses from "../../resources/responses";
-import { PromptMessage } from "../../models/promptMessage";
 import EntityInfo from "../../models/entityInfo";
 import { ActionsHelper } from "../../helpers/actionsHelper";
 
@@ -14,14 +13,14 @@ import { ActionsHelper } from "../../helpers/actionsHelper";
  *
  * @param {TurnContext} context - The context object for the current turn of the conversation.
  * @param {ApplicationTurnState} state - The application turn state object.
- * @param {PromptMessage} data - The prompt message data containing the user's selected company name.
+ * @param {any} data - The prompt message data containing the user's selected company name.
  * @param {ActionPlanner<ApplicationTurnState>} planner - The action planner for the current turn.
  * @returns {Promise<string>} A promise that resolves to an empty string.
  */
 export async function otherCompany(
   context: TurnContext,
   state: ApplicationTurnState,
-  data: PromptMessage,
+  data: any,
   planner: ActionPlanner<ApplicationTurnState>
 ): Promise<string> {
   const logger = logging.getLogger("bot.TeamsAI");
@@ -37,7 +36,7 @@ export async function otherCompany(
 
   try {
     // Get the user's selected company name
-    const companyName = data.request;
+    const companyName = data;
 
     logger.info(`User's selection received: '${companyName}'`);
 

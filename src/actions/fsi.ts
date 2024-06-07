@@ -1,4 +1,4 @@
-import { TurnContext } from "botbuilder";
+import { Channels, TurnContext } from "botbuilder";
 import { AI, ActionPlanner } from "@microsoft/teams-ai";
 import { ApplicationTurnState, ChatParameters } from "../models/aiTypes";
 import { ChatGPTSkill, EntityRecognitionSkill } from "../skills";
@@ -37,7 +37,28 @@ export async function getCompanyInfo(
   // Run the skill
   const response = await chatGPTSkill.run(input);
   if (response) {
-    await context.sendActivity(response);
+    await context.sendActivity({
+      type: "message",
+      text: response,
+      ...(context.activity.channelId === Channels.Msteams
+        ? { channelData: { feedbackLoopEnabled: true } }
+        : {}),
+      entities: [
+        {
+          type: "https://schema.org/Message",
+          "@type": "Message",
+          "@context": "https://schema.org",
+          "@id": "",
+          additionalType: ["AIGeneratedContent"],
+          usageInfo: {
+            name: "Confidential",
+            description:
+              "This message is confidential and intended only for internal use.",
+          },
+        },
+      ],
+    });
+
     logger.info(`Chat response sent: '${response}'`);
   } else {
     // No adaptive card found
@@ -116,14 +137,16 @@ export async function getCompanyDetails(
     // Render the Adaptive Card based on the retrieved company details
     await context.sendActivity({
       attachments: [card],
-      channelData: { feedbackLoopEnabled: true },
+      ...(context.activity.channelId === Channels.Msteams
+        ? { channelData: { feedbackLoopEnabled: true } }
+        : {}),
       entities: [
         {
           type: "https://schema.org/Message",
           "@type": "Message",
           "@context": "https://schema.org",
           "@id": "",
-          // additionalType: ["AIGeneratedContent"],
+          additionalType: ["AIGeneratedContent"],
           usageInfo: {
             name: "Confidential",
             description:

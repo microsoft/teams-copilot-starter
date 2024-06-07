@@ -45,7 +45,7 @@ export class ChatGPTSkill extends BaseAISkill {
   }
 
   /**
-   * Generates a Chat GPT response for the user input using OpenAI's GPT-3.5 API.
+   * Generates a Chat GPT response for the user input using OpenAI's GPT-4 LLM.
    * @returns {Promise<string>} A promise that resolves to a string containing the generated hint.
    * @throws {Error} If the request to OpenAI was rate limited.
    */

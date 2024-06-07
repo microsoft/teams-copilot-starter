@@ -11,8 +11,6 @@ import {
   TeamsAdapter,
   ApplicationBuilder,
   FeedbackLoopData,
-  PredictedSayCommand,
-  AI,
 } from "@microsoft/teams-ai";
 import {
   ActivityTypes,
@@ -22,10 +20,10 @@ import {
   Activity
 } from "botbuilder";
 import { ApplicationTurnState, ChatParameters, TData } from "../models/aiTypes";
+import debug from "debug";
 import { Utils } from "../helpers/utils";
 import EntityInfo from "../models/entityInfo";
 import * as responses from "../resources/responses";
-import { PromptMessage } from "../models/promptMessage";
 import { logging } from "../telemetry/loggerManager";
 import { AIPrompts } from "../prompts/aiPromptTypes";
 import { container } from "tsyringe";
@@ -53,8 +51,7 @@ import {
   flaggedInputAction,
   flaggedOutputAction,
   unknownAction,
-  webRetrieval,
-  formatterAction
+  webRetrieval
 } from "../actions";
 import * as functionNames from "../functions/functionNames";
 import {
@@ -96,6 +93,7 @@ logging
 export class TeamsAI {
   public readonly app: Application<ApplicationTurnState>;
   private readonly logger: Logger;
+  private readonly error: debug.Debugger;
   private readonly planner: ActionPlanner<ApplicationTurnState>;
   private readonly env: Env;
   private readonly LocalVectraIndex: LocalDocumentIndex;
@@ -146,6 +144,12 @@ export class TeamsAI {
     if (!container.isRegistered(Logger))
       container.register(Logger, { useValue: this.logger });
 
+    // Configure the error handler
+    this.error = debug("azureopenai:app:error");
+    this.error.log = console.log.bind(this.logger);
+    this.error.enabled = true;
+
+
     this.env = container.resolve<Env>(Env);
     this.stateStorageManager = container.resolve<BlobsStorageLeaseManager>(BlobsStorageLeaseManager);
 
@@ -178,9 +182,6 @@ export class TeamsAI {
     this.app.ai.action(actionNames.unknownAction, unknownAction);
     this.app.ai.action(actionNames.flaggedInputAction, flaggedInputAction);
     this.app.ai.action(actionNames.flaggedOutputAction, flaggedOutputAction);
-
-    // Register a handler to override the say command with custom logic
-    this.app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, formatterAction);
 
     /**********************************************************************
      * FUNCTION: GET ACTIONS
@@ -293,12 +294,12 @@ export class TeamsAI {
      *****************************************************************/
     this.app.adaptiveCards.actionExecute(
       acActionNames.suggestedPrompt,
-      async (context: TurnContext, state: ApplicationTurnState, data: PromptMessage) => suggestedPrompt(context, state, data, this.planner));
+      async (context: TurnContext, state: ApplicationTurnState, data: any) => suggestedPrompt(context, state, data, this.planner));
 
     // Listen for Other Company command on thr adaptive card from the user
     this.app.adaptiveCards.actionExecute(
       acActionNames.otherCompany,
-      async (context: TurnContext, state: ApplicationTurnState, data: PromptMessage) => otherCompany(context, state, data, this.planner));
+      async (context: TurnContext, state: ApplicationTurnState, data: any) => otherCompany(context, state, data, this.planner));
 
     // Listen for /forgetDocument command and then delete the document properties from state
     this.app.adaptiveCards.actionExecute(actionNames.forgetDocuments, forgetDocuments);
@@ -522,6 +523,31 @@ export class TeamsAI {
         this.logger.error(`Error releasing lease: ${error}`);
       }
       return true;
+    });
+
+
+    /******************************************************************
+     * ERROR
+     * Register a handler to handle the error event
+     * This event is triggered when an error occurs during the processing of a turn
+     *****************************************************************/
+    this.app.error(async (context: TurnContext, err: Error) => {
+      // This check writes out errors to the bound logger (eg. console, Application Insights)
+      this.error(`[onTurnError] unhandled error: ${err}`);
+      this.error(err);
+
+      if (err.message) {
+        this.logger.error(err.message);
+        this.logger.error(err.stack!);
+
+        // Send a trace activity, which will be displayed in Bot Framework Emulator
+        await context.sendTraceActivity(
+          "OnTurnError Trace",
+          `${err.message}`,
+          "https://www.botframework.com/schemas/error",
+          "TurnError"
+        );
+      }
     });
   }
 
