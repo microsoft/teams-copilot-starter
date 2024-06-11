@@ -101,7 +101,7 @@ export class TeamsAI {
   private readonly env: Env;
   private readonly LocalVectraIndex: LocalDocumentIndex;
   private readonly stateStorageManager: BlobsStorageLeaseManager;
-  private readonly authConnectionName = "graph";;
+  private readonly authConnectionName = "graph";
 
   // The name of the channel for M365 Message Extensions
   public static readonly M365CopilotSourceName = "copilot";

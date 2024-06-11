@@ -42,20 +42,20 @@
                     ],
                     "commands": [
                         {
-                            "title": "Help",
-                            "description": "Get help with using Teams Copilot Starter"
+                            "title": "/Newchat",
+                            "description": "Start a new chat with Teams Copilot Starter"
                         },
                         {
-                            "title": "Company Info",
-                            "description": "Get company information"
+                            "title": "Get company info for ",
+                            "description": "Get company information for a given company"
                         },
                         {
-                            "title": "Company Details",
-                            "description": "Get detailed information about a company"
+                            "title": "Get company details for",
+                            "description": "Get financial detailed information for a given company"
                         },
                         {
                             "title": "Analyze document",
-                            "description": "Analyze document content"
+                            "description": "Analyze the uploaded document's content"
                         }
                     ]
                 }
