@@ -81,6 +81,7 @@
     "@microsoft/teamsfx-cli": "2.*",
     "@nrwl/eslint-plugin-nx": "^18.2.2",
     "@nrwl/nx": "^7.8.7",
+    "@types/debug": "^4.1.12",
     "@types/jest": "^29.5.12",
     "@types/json-schema": "^7.0.12",
     "@types/jsonwebtoken": "^9.0.4",

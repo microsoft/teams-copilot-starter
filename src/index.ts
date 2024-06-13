@@ -87,7 +87,7 @@ container.register<BlobsStorageLeaseManager>(BlobsStorageLeaseManager, {
 const bot = configureTeamsAI(storage, adapter, logger, envVariables);
 
 // Add a custom response formatter to convert markdown code blocks to <pre> tags
-addResponseFormatter(bot.app);
+// addResponseFormatter(bot.app);
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: Error) => {

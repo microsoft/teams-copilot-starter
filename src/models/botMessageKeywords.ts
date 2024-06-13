@@ -5,6 +5,6 @@ export enum BotMessageKeywords {
   debug = "/debug",
   forget = "/forget",
   history = "/history",
-  reset = "/reset",
+  reset = "/newchat",
   welcome = "/welcome",
 }

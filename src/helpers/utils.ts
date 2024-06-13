@@ -11,7 +11,7 @@ import EntityInfo from "../models/entityInfo";
 import CompanyInfo from "../models/companyInfo";
 import fetch from "node-fetch";
 import * as ACData from "adaptivecards-templating";
-import { PredictedCommand } from "@microsoft/teams-ai";
+import { Citation, PredictedCommand } from "@microsoft/teams-ai";
 import { ApplicationTurnState } from "../models/aiTypes";
 import { container } from "tsyringe";
 import { Env } from "../env";
@@ -38,7 +38,7 @@ export class Utils {
     }
     try {
       // Try to parse the original content as JSON
-      return JSON.parse(content.replace(/\n/g, "<br/>"));
+      return JSON.parse(content);
     } catch (error) {
       return content;
     }
@@ -149,9 +149,16 @@ export class Utils {
     return CardFactory.adaptiveCard(cardWithData);
   }
 
-  static createM365SearchResultAdaptiveCard(company: CompanyInfo): Attachment {
+  static createM365SearchResultAdaptiveCard(
+    company: CompanyInfo,
+    botId: string
+  ): Attachment {
     const cardTemplate = Utils.getCompaniesListAdaptiveCardTemplate();
-    return Utils.getAdaptiveCardWithData(cardTemplate, { entity: company });
+    const handOffToBotUrl = `https://teams.microsoft.com/l/chat/0/0?users=28:${botId}&continuationToken=${company.id}`;
+    return Utils.getAdaptiveCardWithData(cardTemplate, {
+      entity: company,
+      handOffToBotUrl: handOffToBotUrl,
+    });
   }
 
   static createM365SearchResultHeroCard(company: CompanyInfo): Attachment {
@@ -333,6 +340,11 @@ export class Utils {
             entity: "${entity}",
           },
         },
+        {
+          type: "Action.OpenUrl",
+          title: "Handoff to Teams Copilot",
+          url: "${handOffToBotUrl}",
+        },
       ],
       $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
       version: "1.4",
@@ -382,6 +394,43 @@ export class Utils {
         part ? [acc, part].join(idx < 255 ? "/" : "") : acc
       );
     return encodeURIComponent(sanitized).substring(0, 1024);
+  }
+
+  /**
+   * Extract snippets from the response content limited to the given length.
+   * @param {string} content The content to extract snippets from.
+   * @param {number} length The maximum length of the snippets.
+   * @returns {string} The extracted snippets.
+   */
+  static extractSnippet(content: string, length: number): string {
+    const snippets = content.split("\n").filter((line) => line.length > 0);
+    let snippet = "";
+    let remaining = length;
+    for (const line of snippets) {
+      if (line.length < remaining) {
+        snippet += line + "\n";
+        remaining -= line.length + 1;
+      } else {
+        snippet += line.substring(0, remaining) + "\n";
+        break;
+      }
+    }
+    return snippet;
+  }
+
+  /**
+   * Format the response content so that the sources are numbered instead of [doc1].
+   * @param {string} content The content to format.
+   * @returns {string} The formatted content.
+   */
+  static formatCitationsResponse(content: string): string {
+    const regex = /\[doc(\d+)\]/g;
+    let match;
+    let index = 1;
+    while ((match = regex.exec(content)) !== null) {
+      content = content.replace(match[0], `[${index++}]`);
+    }
+    return content;
   }
 
   /**
@@ -452,5 +501,28 @@ export class Utils {
       clearTimeout(state.temp.typingTimer);
       state.temp.typingTimer = undefined;
     }
+  }
+
+  /**
+   * Extracts citations from the content using a regular expression that uses bolded text to create citations.
+   * @param {string} content The content to extract citations from.
+   * @returns {Citation[]} The extracted citations.
+   */
+  public static extractCitations(content: string): Citation[] {
+    const citations: Citation[] = [];
+    // Create a regular expression to match markdown-style bolded text
+    const regex = /\*\*(.*?)\*\*/g;
+
+    // Extract the citations from the content
+    const matches = Array.from(content.matchAll(regex)).map((m) => m[1]);
+    matches.forEach((match) => {
+      citations.push({
+        title: `Document ${match}`,
+        content: `Document ${match} content`,
+        url: `https://example.com/doc${match}`,
+        filepath: `doc${match}.pdf`,
+      });
+    });
+    return citations;
   }
 }

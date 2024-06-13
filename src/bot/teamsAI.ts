@@ -10,6 +10,7 @@ import {
   Memory,
   TeamsAdapter,
   ApplicationBuilder,
+  FeedbackLoopData,
   AuthError,
 } from "@microsoft/teams-ai";
 import {
@@ -21,10 +22,10 @@ import {
   CardFactory
 } from "botbuilder";
 import { ApplicationTurnState, ChatParameters, TData } from "../models/aiTypes";
+import debug from "debug";
 import { Utils } from "../helpers/utils";
 import EntityInfo from "../models/entityInfo";
 import * as responses from "../resources/responses";
-import { PromptMessage } from "../models/promptMessage";
 import { logging } from "../telemetry/loggerManager";
 import { AIPrompts } from "../prompts/aiPromptTypes";
 import { container } from "tsyringe";
@@ -95,11 +96,12 @@ logging
 export class TeamsAI {
   public readonly app: Application<ApplicationTurnState>;
   private readonly logger: Logger;
+  private readonly error: debug.Debugger;
   private readonly planner: ActionPlanner<ApplicationTurnState>;
   private readonly env: Env;
   private readonly LocalVectraIndex: LocalDocumentIndex;
   private readonly stateStorageManager: BlobsStorageLeaseManager;
-  private readonly authConnectionName = "graph";;
+  private readonly authConnectionName = "graph";
 
   // The name of the channel for M365 Message Extensions
   public static readonly M365CopilotSourceName = "copilot";
@@ -118,6 +120,7 @@ export class TeamsAI {
       .withAIOptions({
         planner: planner,
         allow_looping: false, // set false for sequence augmentation to prevent sending the return value of the last action to the AI.run method
+        enable_feedback_loop: true, // enables the user feedback functionality
       })
       .withAuthentication(adapter, {
         settings: {
@@ -164,7 +167,14 @@ export class TeamsAI {
     if (!container.isRegistered(Logger))
       container.register(Logger, { useValue: this.logger });
 
-    // Register the BlobsStorageLeaseManager singleton, if it is not registered
+    // Configure the error handler
+    this.error = debug("azureopenai:app:error");
+    this.error.log = console.log.bind(this.logger);
+    this.error.enabled = true;
+
+    // Resolve the Environment dependency injection
+    this.env = container.resolve<Env>(Env);
+    // Resolve the BlobsStorageLeaseManager dependency injection
     this.stateStorageManager = container.resolve<BlobsStorageLeaseManager>(BlobsStorageLeaseManager);
 
     // Create a local Vectra index
@@ -348,16 +358,41 @@ export class TeamsAI {
     this.app.ai.action(actionNames.forgetDocuments, forgetDocuments);
 
     /******************************************************************
+     * USER FEEDBACK LOOP
+     *****************************************************************/
+    this.app.feedbackLoop(async (context: TurnContext, state: ApplicationTurnState, feedback: FeedbackLoopData) => {
+      // Log the feedback
+      this.logger.info(`Feedback received: ${JSON.stringify(feedback)}`);
+      await context.sendActivity("Thank you for your feedback.");
+      if (state.conversation.debug) {
+        await context.sendActivity(`Feedback received: ${JSON.stringify(feedback)}`);
+      }
+    });
+
+    /******************************************************************
+     * HANDOFF
+     *****************************************************************/
+    // Register a handler to handle the handoff action
+    this.app.handoff(async (context: TurnContext, state: ApplicationTurnState, continuation: string) => {
+      // Log the handoff
+      this.logger.info(`Handoff received: ${continuation}`);
+      await context.sendActivity("Continuing the conversation started with M365 Copilot.");
+      if (state.conversation.debug) {
+        await context.sendActivity(`Handoff received: ${continuation}`);
+      }
+    });
+
+    /******************************************************************
      * ADAPTIVE CARD ACTIONS: GetCompanyDetails
      *****************************************************************/
     this.app.adaptiveCards.actionExecute(
       acActionNames.suggestedPrompt,
-      async (context: TurnContext, state: ApplicationTurnState, data: PromptMessage) => suggestedPrompt(context, state, data, this.planner));
+      async (context: TurnContext, state: ApplicationTurnState, data: any) => suggestedPrompt(context, state, data, this.planner));
 
     // Listen for Other Company command on thr adaptive card from the user
     this.app.adaptiveCards.actionExecute(
       acActionNames.otherCompany,
-      async (context: TurnContext, state: ApplicationTurnState, data: PromptMessage) => otherCompany(context, state, data, this.planner));
+      async (context: TurnContext, state: ApplicationTurnState, data: any) => otherCompany(context, state, data, this.planner));
 
     // Listen for /forgetDocument command and then delete the document properties from state
     this.app.adaptiveCards.actionExecute(actionNames.forgetDocuments, forgetDocuments);
@@ -368,6 +403,7 @@ export class TeamsAI {
     // Listen for message extension select item command
     this.app.messageExtensions.selectItem(selectItem);
 
+    // Task Module handler
     this.app.taskModules.fetch(
       actionNames.getCompanyInfo,
       async (
@@ -580,6 +616,31 @@ export class TeamsAI {
         this.logger.error(`Error releasing lease: ${error}`);
       }
       return true;
+    });
+
+
+    /******************************************************************
+     * ERROR
+     * Register a handler to handle the error event
+     * This event is triggered when an error occurs during the processing of a turn
+     *****************************************************************/
+    this.app.error(async (context: TurnContext, err: Error) => {
+      // This check writes out errors to the bound logger (eg. console, Application Insights)
+      this.error(`[onTurnError] unhandled error: ${err}`);
+      this.error(err);
+
+      if (err.message) {
+        this.logger.error(err.message);
+        this.logger.error(err.stack!);
+
+        // Send a trace activity, which will be displayed in Bot Framework Emulator
+        await context.sendTraceActivity(
+          "OnTurnError Trace",
+          `${err.message}`,
+          "https://www.botframework.com/schemas/error",
+          "TurnError"
+        );
+      }
     });
   }
 

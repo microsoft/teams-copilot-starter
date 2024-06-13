@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { ActionPlanner } from "@microsoft/teams-ai";
+import { ActionPlanner, Citation, ClientCitation } from "@microsoft/teams-ai";
 import { AllowedFileTypes, ApplicationTurnState } from "../models/aiTypes";
 import { Attachment, TurnContext } from "botbuilder";
 import * as mime from "mime-types";
@@ -204,5 +204,28 @@ export class ActionsHelper {
         throw new Error("CustomAI is not supported for embeddings");
         break;
     }
+  }
+
+  /**
+   * Formats the citations from the AI response into a format that can be used by the client
+   * @param content The content from the AI response
+   * @param citations The citations from the AI response
+   * @returns The formatted citations
+   */
+  public static formatCitations(citations: Citation[]): ClientCitation[] {
+    // If the response from AI includes citations, they will be parsed and added to the response
+    const clientCitations = citations.map((citation, i) => {
+      return {
+        "@type": "Claim",
+        position: `${i + 1}`,
+        appearance: {
+          "@type": "DigitalDocument",
+          name: citation.title,
+          abstract: Utils.extractSnippet(citation.content, 500),
+        },
+      } as ClientCitation;
+    });
+
+    return clientCitations;
   }
 }
