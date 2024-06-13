@@ -12,6 +12,8 @@ import {
   ApplicationBuilder,
   FeedbackLoopData,
   AuthError,
+  PredictedSayCommand,
+  AI,
 } from "@microsoft/teams-ai";
 import {
   ActivityTypes,
@@ -54,7 +56,8 @@ import {
   flaggedOutputAction,
   unknownAction,
   webRetrieval,
-  getCompanyStockQuote
+  getCompanyStockQuote,
+  formatterAction
 } from "../actions";
 import * as functionNames from "../functions/functionNames";
 import {
@@ -266,6 +269,9 @@ export class TeamsAI {
     this.app.ai.action(actionNames.flaggedInputAction, flaggedInputAction);
     this.app.ai.action(actionNames.flaggedOutputAction, flaggedOutputAction);
 
+    // Register a handler to override the say command with custom logic
+    this.app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, formatterAction);    
+    
     /**********************************************************************
      * FUNCTION: GET ACTIONS
      * Register a handler to handle the "getActions" semantic function
