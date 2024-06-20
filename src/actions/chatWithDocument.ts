@@ -104,7 +104,12 @@ export async function chatWithDocument(
   }
 
   try {
-    // Send an adaptive cards with the details
+    if (docs.length > 1) {
+      await context.sendActivity(
+        `You have uploaded ${docs.length} document(s) or website(s). These will be processed now.'`
+      );
+    }
+    // Send an adaptive cards with the details for each document
     for (const doc of docs) {
       const hashFromUri = crypto
         .createHash("sha256")
@@ -125,13 +130,6 @@ export async function chatWithDocument(
     logger.error(`Failed running skill: ${(error as Error).message}`);
     await context.sendActivity("I'm sorry, I could not process the document.");
     return AI.StopCommandName;
-  } finally {
-    // Delete the uploaded documents from the vectra index
-    // questionDocument.deleteExternalContent(
-    //   state.conversation.uploadedDocuments
-    // );
-    // state.conversation.uploadedDocuments = undefined;
-    // state.conversation.documentIds = [];
   }
   return "Provided document details.";
 }
