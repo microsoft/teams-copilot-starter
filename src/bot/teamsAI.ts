@@ -441,6 +441,9 @@ export class TeamsAI {
     this.app.message(
       BotMessageKeywords.newchat,
       async (context: TurnContext, state: ApplicationTurnState) => {
+        // forget documents from index
+        await forgetDocuments(context, state);
+        
         state.deleteConversationState();
         // change the prompt folder to the default
         state.conversation.promptFolder = this.env.data.DEFAULT_PROMPT_NAME;
