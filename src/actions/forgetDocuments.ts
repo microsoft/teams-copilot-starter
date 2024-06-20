@@ -75,6 +75,7 @@ export async function forgetDocuments(
   }
 
   state.conversation.documentIds = [];
+  state.conversation.uploadedDocuments = undefined;
 
   if (state.conversation.definedWebUrl) {
     logger.info(

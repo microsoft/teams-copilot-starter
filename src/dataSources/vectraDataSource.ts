@@ -73,6 +73,14 @@ export class VectraDataSource implements DataSource {
   ): Promise<RenderedPromptSection<string>> {
     // Query index
     const query = memory.getValue("temp.input") as string;
+    // Get the hash from the uri. This is set when the user uploads a document
+    // The document is added to index when uploaded
+    // The hash is used to filter the document content from the local index to ensure only content from the uploaded document is returned
+    const hashFromUploadedDocument = memory.getValue(
+      "temp.hashFromUploadedDocument"
+    ) as string;
+    const docId = await this.index.getDocumentId(hashFromUploadedDocument);
+
     const results = await this._index.queryDocuments(query, {
       maxDocuments: this._options.maxDocuments ?? 5,
       maxChunks: this._options.maxChunks ?? 50,
@@ -82,7 +90,11 @@ export class VectraDataSource implements DataSource {
     let length = 0;
     let output = "";
     let connector = "";
-    for (const result of results) {
+    const filterResults =
+      docId === undefined
+        ? results
+        : results.filter((result) => result.id === docId);
+    for (const result of filterResults) {
       // Start a new doc
       let doc = `${connector}url: ${result.uri}\n`;
       let docLength = tokenizer.encode(doc).length;

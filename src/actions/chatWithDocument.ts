@@ -14,6 +14,7 @@ import { FileAttachment } from "../models/fileAttachment";
 import * as responses from "../resources/responses";
 import * as Errors from "../types/errors";
 import byodAnswerCard from "../adaptiveCards/templates/byodAnswer.json";
+import crypto from "crypto";
 
 /**
  * Initiates a chat session with a document.
@@ -102,24 +103,35 @@ export async function chatWithDocument(
     return AI.StopCommandName;
   }
 
-  // Run the skill and get the action plan back
-  const response = await questionDocument.run(input);
-  if (response) {
+  try {
     // Send an adaptive cards with the details
-    await Promise.all(
-      docs.map(async (doc: FileAttachment) => {
-        const card = Utils.renderAdaptiveCard(byodAnswerCard, {
-          docType: "the document",
-          filename: doc.fileName,
-          answer: response,
-        });
-        await context.sendActivity({ attachments: [card] });
-      })
-    );
-  } else {
+    for (const doc of docs) {
+      const hashFromUri = crypto
+        .createHash("sha256")
+        .update(doc.url)
+        .digest("hex");
+      const response = await questionDocument.run(input, hashFromUri);
+      if (!response) {
+        return AI.StopCommandName;
+      }
+      const card = Utils.renderAdaptiveCard(byodAnswerCard, {
+        docType: "the document",
+        filename: doc.fileName,
+        answer: response,
+      });
+      await context.sendActivity({ attachments: [card] });
+    }
+  } catch (error: unknown) {
+    logger.error(`Failed running skill: ${(error as Error).message}`);
+    await context.sendActivity("I'm sorry, I could not process the document.");
     return AI.StopCommandName;
+  } finally {
+    // Delete the uploaded documents from the vectra index
+    // questionDocument.deleteExternalContent(
+    //   state.conversation.uploadedDocuments
+    // );
+    // state.conversation.uploadedDocuments = undefined;
+    // state.conversation.documentIds = [];
   }
-
-  // Continue action command execution
-  return response;
+  return "Provided document details.";
 }
