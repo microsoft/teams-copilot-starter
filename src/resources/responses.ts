@@ -221,10 +221,9 @@ export function contentRetrievalInProgress(): string {
 
 export function noUploadedDocument(): string {
   return getRandomResponse([
-    "I'm sorry, but I couldn't find any uploaded documents.",
-    "Apologies, but I don't have any uploaded documents to process.",
-    "I regret to inform you that I'm unable to find any uploaded documents.",
-    "I apologize for the inconvenience, but I don't have any uploaded documents to process.",
+    "Since no documents were uploaded, I'll use the ingested documents saved in Azure Blob Storage.",
+    "As no documents were uploaded, I'll utilize the ingested documents saved in Azure Blob Storage.",
+    "Since no documents were uploaded, I'll refer to the ingested documents saved in Azure Blob Storage.",
   ]);
 }
 
