@@ -1,5 +1,10 @@
 import "reflect-metadata";
-import { ActionPlanner, Citation, ClientCitation, PromptTemplate } from "@microsoft/teams-ai";
+import {
+  ActionPlanner,
+  Citation,
+  ClientCitation,
+  PromptTemplate,
+} from "@microsoft/teams-ai";
 import { AllowedFileTypes, ApplicationTurnState } from "../models/aiTypes";
 import { Attachment, TurnContext } from "botbuilder";
 import path from "path";
