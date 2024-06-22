@@ -8,7 +8,6 @@ import {
   TeamsAdapter,
 } from "@microsoft/teams-ai";
 import path from "path";
-import fs from "fs";
 import { TeamsAI } from "./bot/teamsAI";
 import { TurnContext, Storage } from "botbuilder";
 import { Logger } from "./telemetry/logger";
@@ -96,28 +95,6 @@ export function configureTeamsAI(
       const template = state.conversation.promptFolder
         ? await prompts.getPrompt(state.conversation.promptFolder)
         : await prompts.getPrompt(env.data.DEFAULT_PROMPT_NAME);
-      const skprompt = fs.readFileSync(
-        path.join(__dirname, "prompts", "plan", "skprompt.txt")
-      );
-      //
-      // Use the Azure AI Search data source for RAG over documents
-      //
-      const dataSources = (template.config.completion as any)["data_sources"];
-
-      if (dataSources && dataSources.length > 0) {
-        dataSources.forEach((dataSource: any) => {
-          if (dataSource.type === "azure_search" && dataSource.parameters) {
-            dataSource.parameters.endpoint = env.data.AZURE_SEARCH_ENDPOINT;
-            dataSource.parameters.authentication.key =
-              env.data.AZURE_SEARCH_KEY;
-            dataSource.parameters.role_information = `${skprompt.toString(
-              "utf-8"
-            )} \n\nActions: ${JSON.stringify(template.actions, null, 2)}`;
-          }
-        });
-      } else {
-        logger.error("No data sources found in the environment settings.");
-      }
 
       return template;
     },

@@ -48,7 +48,7 @@ import * as actionNames from "../actions/actionNames";
 import { 
   debugOn,
   debugOff,
-  getCompanyInfo,
+  getSemanticInfo,
   getCompanyDetails,
   chatWithDocument,
   forgetDocuments,
@@ -318,15 +318,15 @@ export class TeamsAI {
     this.app.ai.action(actionNames.debugOff, debugOff);
 
     /******************************************************************
-     * ACTION: GET COMPANY INFO
+     * ACTION: GET SEMANTIC GENERIC INFO
      *****************************************************************/
-    // Define a prompt action when the user sends a message containing the "getLatestInfo" action
-    this.app.ai.action(actionNames.getCompanyInfo, async (context: TurnContext, state: ApplicationTurnState) => getCompanyInfo(context, state, this.planner));
+    // Define a prompt action when the user sends a message containing the "getSemanticInfo" action
+    this.app.ai.action(actionNames.getSemanticInfo, async (context: TurnContext, state: ApplicationTurnState) => getSemanticInfo(context, state, this.planner));
 
     /******************************************************************
      * ACTION: GET COMPANY DETAILS
      *****************************************************************/
-    // Define a prompt action when the user sends a message containing the "getLatestInfo" action
+    // Define a prompt action when the user sends a message containing the "getCompanyDetails" action
     this.app.ai.action(
       actionNames.getCompanyDetails, 
       async (context: TurnContext, state: ApplicationTurnState, parameters: ChatParameters) => getCompanyDetails(context, state, parameters, this.planner));
@@ -411,7 +411,7 @@ export class TeamsAI {
 
     // Task Module handler
     this.app.taskModules.fetch(
-      actionNames.getCompanyInfo,
+      actionNames.getSemanticInfo,
       async (
         context: TurnContext,
         state: ApplicationTurnState,

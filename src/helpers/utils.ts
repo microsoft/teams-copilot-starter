@@ -168,7 +168,7 @@ export class Utils {
     card.content.tap = {
       type: "invoke",
       value: {
-        verb: "getCompanyInfo",
+        verb: "getSemanticInfo",
         entity: company,
       },
     };
@@ -332,11 +332,11 @@ export class Utils {
           type: "Action.Submit",
           title: "View Details",
           data: {
-            verb: "getCompanyInfo",
+            verb: "getSemanticInfo",
             msteams: {
               type: "task/fetch",
             },
-            command: "getCompanyInfo",
+            command: "getSemanticInfo",
             entity: "${entity}",
           },
         },

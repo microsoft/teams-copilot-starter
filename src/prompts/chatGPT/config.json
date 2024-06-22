@@ -8,13 +8,44 @@
       "include_input": true,
       "max_input_tokens": 2800,
       "max_tokens": 1000,
-      "temperature": 0.2,
+      "temperature": 0.9,
       "top_p": 0.0,
       "presence_penalty": 0.6,
       "frequency_penalty": 0.0,
-      "stop_sequences": []
+      "stop_sequences": [],
+      "stop": null,
+      "stream": true,
+      "data_sources": [
+        {
+            "type": "azure_search",
+            "parameters": {
+                "endpoint": "$searchEndpoint",
+                "index_name": "sample-documents-vector-index",
+                "authentication": {
+                    "type": "api_key",
+                    "key": "$searchApiKey"
+                },
+                "semantic_configuration": "default",
+                "query_type": "semantic",
+                "fields_mapping": {
+                  "content_fields_separator": "\n",
+                  "content_fields": [
+                    "content"
+                  ],
+                  "filepath_field": "content",
+                  "title_field": null,
+                  "url_field": "url",
+                  "vector_fields": []
+                },
+                "in_scope": false,
+                "filter": null,
+                "strictness": 5,
+                "top_n_documents": 10
+            }
+        }      
+      ]      
     },
     "augmentation": {
-        "augmentation_type": "none"
+        "augmentation_type": "sequence"
     }
   }
