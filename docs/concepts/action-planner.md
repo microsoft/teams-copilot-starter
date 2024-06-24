@@ -7,7 +7,9 @@ The Action Planner has a built-in prompt management system that supports creatin
 Teams Copilot Starter comes with the following prompt templates:
 
 - **plan**: uses a dynamic prompt and configuration parameters to control behavior of Teams AI Library Action Planner. This prompt template contains the configuration of all supported `actions` by Teams Copilot Starter. More about supported `actions` later in this document.
+  
 - **chatGPT**: uses a user defined dynamic prompt to support a freely flowing conversation with the user via use of LLM chat completion model. It has the ability to "remember" (maintain) the conversation history up to the configurable number of turns.
+  
 - **findEntity**: uses a user defined prompt template that instructs LLM to look up for a publicly known company entity to be returned in the specified JSON format:
 
   ```json

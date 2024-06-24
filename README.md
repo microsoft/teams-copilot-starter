@@ -147,12 +147,14 @@ This action in the pipeline copies the environment variables from the `.env.loca
 | `STORAGE_ACCOUNT_KEY` | The key for the storage account |
 | `AZURE_SEARCH_ENDPOINT` | The URL endpoint to the Azure AI Search service |
 | `AZURE_SEARCH_KEY` | The key for the Azure AI Search service |
+| `AZURE_SEARCH_INDEX_NAME` | The name of the Azure AI Search index |
 | `VECTRA_INDEX_PATH` | The path of the Vectra database index. This is used for non-production scenarios. When running locally, the value is `../index` and when running in Azure, the value is `D:\\Home\\index`. |
 | `OPENAI_API_VERSION` | This is only used by Azure OpenAI |
 | `DEFAULT_PROMPT_NAME` | The default prompt name. The default is `plan` and refers to the folder name in `prompts/` folder |
 | `STORAGE_CONTAINER_NAME` | The name of the storage container that will store conversation state |
 | `WEBDATA_SOURCE_NAME` | The name of the web data source. If this value is changed, it will also need to be changed in the `prompts/questionWeb/config.json` file |
 | `DOCUMENTDATA_SOURCE_NAME` | The name of the document data source. If this value is changed, it will also need to be changed in the `prompts/questionDocument/config.json` file |
+| `AZURE_SEARCH_SOURCE_NAME` | The name of the Azure AI Search data source property. If this value is changed, it will also need to be changed in the `prompts/chatGPT/config.json` file |
 | `MAX_TURNS` | The maximum number of turns |
 | `MAX_FILE_SIZE` | The maximum file size |
 | `MAX_PAGES` | The maximum number of pages |
