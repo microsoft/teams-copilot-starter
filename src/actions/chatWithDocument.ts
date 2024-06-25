@@ -14,6 +14,7 @@ import { FileAttachment } from "../models/fileAttachment";
 import * as responses from "../resources/responses";
 import * as Errors from "../types/errors";
 import byodAnswerCard from "../adaptiveCards/templates/byodAnswer.json";
+import crypto from "crypto";
 
 /**
  * Initiates a chat session with a document.
@@ -102,24 +103,33 @@ export async function chatWithDocument(
     return AI.StopCommandName;
   }
 
-  // Run the skill and get the action plan back
-  const response = await questionDocument.run(input);
-  if (response) {
-    // Send an adaptive cards with the details
-    await Promise.all(
-      docs.map(async (doc: FileAttachment) => {
-        const card = Utils.renderAdaptiveCard(byodAnswerCard, {
-          docType: "the document",
-          filename: doc.fileName,
-          answer: response,
-        });
-        await context.sendActivity({ attachments: [card] });
-      })
-    );
-  } else {
+  try {
+    if (docs.length > 1) {
+      await context.sendActivity(
+        `You have uploaded ${docs.length} document(s) or website(s). These will be processed now.'`
+      );
+    }
+    // Send an adaptive cards with the details for each document
+    for (const doc of docs) {
+      const hashFromUri = crypto
+        .createHash("sha256")
+        .update(doc.url)
+        .digest("hex");
+      const response = await questionDocument.run(input, hashFromUri);
+      if (!response) {
+        return AI.StopCommandName;
+      }
+      const card = Utils.renderAdaptiveCard(byodAnswerCard, {
+        docType: "the document",
+        filename: doc.fileName,
+        answer: response,
+      });
+      await context.sendActivity({ attachments: [card] });
+    }
+  } catch (error: unknown) {
+    logger.error(`Failed running skill: ${(error as Error).message}`);
+    await context.sendActivity("I'm sorry, I could not process the document.");
     return AI.StopCommandName;
   }
-
-  // Continue action command execution
-  return response;
+  return "Provided document details.";
 }

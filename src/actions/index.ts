@@ -6,3 +6,4 @@ export { getCompanyDetails, getCompanyInfo } from "./fsi";
 export { webRetrieval } from "./webRetrieval";
 export { forgetDocuments } from "./forgetDocuments";
 export { getCompanyStockQuote } from "./getCompanyStockQuote";
+export { resetIndex } from "./resetIndex";

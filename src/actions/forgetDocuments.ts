@@ -58,12 +58,6 @@ export async function forgetDocuments(
       );
     }
 
-    // Obtain the local index
-    const localIndex = vectraDS.index;
-
-    // Delete the local vectra index
-    localIndex.deleteIndex();
-
     // Log the uploaded documents that have been forgotten
     const documents = state.conversation.uploadedDocuments
       ?.map((doc) => doc.fileName)
@@ -75,6 +69,7 @@ export async function forgetDocuments(
   }
 
   state.conversation.documentIds = [];
+  state.conversation.uploadedDocuments = undefined;
 
   if (state.conversation.definedWebUrl) {
     logger.info(

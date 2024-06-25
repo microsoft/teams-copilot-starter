@@ -50,6 +50,7 @@ export interface TempState extends DefaultTempState {
   leaseId: string;
   startTime: number;
   typingTimer: NodeJS.Timeout | undefined;
+  hashFromUploadedDocument: string | undefined;
 }
 
 export type ApplicationTurnState = TurnState<

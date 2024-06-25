@@ -54,7 +54,8 @@ import {
   flaggedOutputAction,
   unknownAction,
   webRetrieval,
-  getCompanyStockQuote
+  getCompanyStockQuote,
+  resetIndex
 } from "../actions";
 import * as functionNames from "../functions/functionNames";
 import {
@@ -436,10 +437,13 @@ export class TeamsAI {
       }
     );
 
-    // Listen for /reset command and then delete the conversation state
+    // Listen for /newchat command and then delete the conversation state
     this.app.message(
-      BotMessageKeywords.reset,
+      BotMessageKeywords.newchat,
       async (context: TurnContext, state: ApplicationTurnState) => {
+        // forget documents from index
+        await forgetDocuments(context, state);
+        
         state.deleteConversationState();
         // change the prompt folder to the default
         state.conversation.promptFolder = this.env.data.DEFAULT_PROMPT_NAME;
@@ -448,8 +452,6 @@ export class TeamsAI {
         state.deleteUserState();
         CacheHelper.clearCurrentUser(state);
         CacheHelper.clearConversationHistory(state);
-        // Delete the local vectra index
-        this.LocalVectraIndex.deleteIndex();
         state.conversation.documentIds = [];
 
         await context.sendActivity(responses.reset());
@@ -460,21 +462,12 @@ export class TeamsAI {
       }
     );
 
-    // Listen for /forget command and then delete the document properties from state
+    // Listen for /resetIndex command and then delete the conversation state
     this.app.message(
-      BotMessageKeywords.forget,
+      BotMessageKeywords.resetIndex,
       async (context: TurnContext, state: ApplicationTurnState) => {
-        await context.sendActivity("Uploaded document has been forgotten.");
-        this.logger.info(
-          `${state.conversation.uploadedDocuments?.length} uploaded document have been forgotten.`
-        );
-        state.conversation.uploadedDocuments = undefined;
-        // Delete the local vectra index
-        this.LocalVectraIndex.deleteIndex();
-        state.conversation.documentIds = [];
-
-        // const appState = container.resolve<ApplicationState>(ApplicationState);
-        // appState.set(state, await UserHelper.getUserInfo(context, state));
+        const result = await resetIndex(context, state);
+        await context.sendActivity(result);
       }
     );
 
@@ -532,7 +525,7 @@ export class TeamsAI {
             ?.map((doc) => doc.fileName)
             .join(", ");
           await context.sendActivity(
-            `The current uploaded document(s) are ${documents}. Use "/forget" to forget the document(s).`
+            `The current uploaded document(s) are ${documents}. Use "forget documents" to forget the document(s).`
           );
         } else {
           await context.sendActivity(
