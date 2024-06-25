@@ -7,4 +7,4 @@ export { getCompanyDetails } from "./fsi";
 export { webRetrieval } from "./webRetrieval";
 export { forgetDocuments } from "./forgetDocuments";
 export { getCompanyStockQuote } from "./getCompanyStockQuote";
-export { formatterAction } from "./formatter";
+export { formatActionMessage } from "./formatter";

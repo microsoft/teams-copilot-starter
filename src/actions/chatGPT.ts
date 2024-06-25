@@ -6,7 +6,7 @@ import { Utils } from "../helpers/utils";
 import { UserHelper } from "../helpers/userHelper";
 import { logging } from "../telemetry/loggerManager";
 import * as responses from "../resources/responses";
-import { formatterAction } from ".";
+import { formatActionMessage } from "./formatter";
 
 /**
  * Retrieves semantic generic information using the Chat GPT Skill.
@@ -39,7 +39,7 @@ export async function getSemanticInfo(
     logger.info(`Chat response sent: '${response.content}'`);
 
     // Send the formatted response that may include the reference document citations
-    return await formatterAction(context, state, response);
+    return await formatActionMessage(context, state, response);
   } else {
     // No adaptive card found
     logger.info(`No response from GPT has been generated for '${input}'`);

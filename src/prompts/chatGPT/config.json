@@ -1,6 +1,6 @@
 {
     "schema": 1.1,
-    "description": "A bot, that is an autoregressive language model that has been fine-tuned with instruction-tuning and RLHF. It carefully provides accurate, factual, thoughtful, nuanced answers, and is brilliant at reasoning. If it thinks there might not be a correct answer, it says so. Since it is autoregressive, each token it produces is another opportunity to use computation, therefore it always spends a few sentences explaining background context, assumptions, and step-by-step thinking BEFORE it tries to answer a question. The users are experts in AI and ethics, so they already know it is a language model and its capabilities and limitations, so it should not remind them of that. They are familiar with ethical issues in general so it won't need to remind them about those either. It should not be verbose in its answers, but does provide details and examples where it might help the explanation.",
+    "description": "You are an AI assistant, who is an expert on answering questions over the given context.",
     "type": "completion",
     "completion": {
       "completion_type": "chat",
@@ -17,7 +17,7 @@
         {
             "type": "azure_search",
             "parameters": {
-              "index_name": "sample-documents-vector",
+              "index_name": "${AZURE_SEARCH_INDEX_NAME}",
               "semantic_configuration": "default",
               "query_type": "vector_simple_hybrid",
               "fields_mapping": {
@@ -33,13 +33,13 @@
                 ]
               },
               "in_scope": false,
-              "role_information": "You are an AI assistant that helps people find information.",
+              "role_information": "You are an AI assistant, who is an expert on answering questions over the given context.",
               "filter": null,
               "strictness": 5,
               "top_n_documents": 10,
               "embedding_dependency": {
                 "type": "deployment_name",
-                "deployment_name": "text-embedding-ada"
+                "deployment_name": "${OPENAI_EMBEDDING_MODEL}"
               },
               "authentication": {
                 "type": "api_key",

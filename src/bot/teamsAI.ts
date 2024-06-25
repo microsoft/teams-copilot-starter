@@ -57,7 +57,7 @@ import {
   unknownAction,
   webRetrieval,
   getCompanyStockQuote,
-  formatterAction
+  formatActionMessage,
 } from "../actions";
 import * as functionNames from "../functions/functionNames";
 import {
@@ -270,7 +270,7 @@ export class TeamsAI {
     this.app.ai.action(actionNames.flaggedOutputAction, flaggedOutputAction);
 
     // Register a handler to override the say command with custom logic
-    this.app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, formatterAction);    
+    this.app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, formatActionMessage);    
     
     /**********************************************************************
      * FUNCTION: GET ACTIONS

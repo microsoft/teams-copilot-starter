@@ -11,7 +11,6 @@ import { AxiosError } from "axios";
 import { logging } from "../telemetry/loggerManager";
 import { Utils } from "../helpers/utils";
 import { ActionsHelper } from "../helpers/actionsHelper";
-import { formatterAction } from "../actions";
 import { AzureAISearchDataSource } from "../dataSources/azureAISearchDataSource";
 import { env } from "process";
 import { Env } from "../env";
@@ -79,16 +78,6 @@ export class ChatGPTSkill extends BaseAISkill {
     this.state.temp.input = JSON.stringify(chatHistory);
 
     // Add the Azure OpenAI Embeddings data source to the prompt
-    const data1 = new AzureAISearchDataSource({
-      name: this.env.data.AZURE_SEARCH_SOURCE_NAME,
-      indexName: this.env.data.AZURE_SEARCH_INDEX_NAME,
-      azureAISearchApiKey: this.env.data.AZURE_SEARCH_KEY,
-      azureAISearchEndpoint: this.env.data.AZURE_SEARCH_ENDPOINT,
-      azureOpenAIApiKey: this.env.data.OPENAI_KEY,
-      azureOpenAIEndpoint: this.env.data.OPENAI_ENDPOINT,
-      azureOpenAIEmbeddingDeployment: this.env.data.OPENAI_EMBEDDING_MODEL,
-    });
-
     this.planner.prompts.addDataSource(
       new AzureAISearchDataSource({
         name: this.env.data.AZURE_SEARCH_SOURCE_NAME,
@@ -99,11 +88,6 @@ export class ChatGPTSkill extends BaseAISkill {
         azureOpenAIEndpoint: this.env.data.OPENAI_ENDPOINT,
         azureOpenAIEmbeddingDeployment: this.env.data.OPENAI_EMBEDDING_MODEL,
       })
-    );
-
-    const data2 = await ActionsHelper.addAzureAISearchDataSource(
-      AIPrompts.ChatGPT,
-      this.planner
     );
 
     // Add the Azure AI Search RAG data source to the prompt
@@ -160,7 +144,6 @@ export class ChatGPTSkill extends BaseAISkill {
       }
 
       return response.message;
-      // return Utils.extractJsonResponse(response.message?.content);
     } catch (error: any) {
       if (error.name === "AxiosError" && error.message.includes("429")) {
         await this.context.sendActivity(responses.openAIRateLimited());

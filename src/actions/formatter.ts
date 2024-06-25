@@ -1,13 +1,8 @@
 import { ActivityTypes, Channels, TurnContext } from "botbuilder";
-import {
-  AI,
-  ClientCitation,
-  Message,
-  PredictedSayCommand,
-} from "@microsoft/teams-ai";
-import { ApplicationTurnState } from "../models/aiTypes";
+import { AI, Message, PredictedSayCommand } from "@microsoft/teams-ai";
 import { Utils } from "../helpers/utils";
 import { AIEntity } from "@microsoft/teams-ai/lib/actions";
+import { ApplicationTurnState } from "../models/aiTypes";
 
 /**
  * Formats the response from the AI and sends it to the user.
@@ -17,7 +12,7 @@ import { AIEntity } from "@microsoft/teams-ai/lib/actions";
  * @param action The action to return.
  * @returns A promise that resolves to a string representing the action.
  */
-export async function formatterAction(
+export async function formatActionMessage(
   context: TurnContext,
   state: ApplicationTurnState,
   command: PredictedSayCommand | Message<string>,
@@ -25,7 +20,7 @@ export async function formatterAction(
 ): Promise<string> {
   const response = (command as PredictedSayCommand).response ?? command;
   if (!response?.content) {
-    return "";
+    return action ?? AI.StopCommandName;
   }
 
   let content = response.content;
@@ -36,30 +31,10 @@ export async function formatterAction(
   }
 
   // If the response from AI includes citations, they will be parsed and added to the response
-  let citations: ClientCitation[] | undefined = undefined;
-
-  if (response.context && response.context.citations.length > 0) {
-    citations = response.context.citations.map((citation, i) => {
-      return {
-        "@type": "Claim",
-        position: `${i + 1}`,
-        appearance: {
-          "@type": "DigitalDocument",
-          name: citation.title,
-          abstract: Utils.extractSnippet(citation.content, 500),
-        },
-      } as ClientCitation;
-    });
-  }
-
-  // If there are citations, modify the content so that the sources are numbered instead of [doc1]
-  const contentText = !citations
-    ? content
-    : Utils.formatCitationsResponse(content);
-
-  // If there are citations, filter out the citations unused in content. TODO: Implement this
-  // const referencedCitations = citations ? Utilities.getUsedCitations(contentText, citations) : undefined;
-  const referencedCitations = citations;
+  const [contentText, referencedCitations] =
+    response.context && response.context.citations.length > 0
+      ? Utils.formatCitations(content, response.context.citations)
+      : [response.content, null];
 
   // Send the response
   await context.sendActivity({
@@ -78,5 +53,5 @@ export async function formatterAction(
     ] as AIEntity[],
   });
 
-  return action ?? "";
+  return action ?? AI.StopCommandName;
 }

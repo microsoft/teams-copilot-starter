@@ -271,12 +271,14 @@ export class ActionsHelper {
         if (dataSource.type === "azure_search" && dataSource.parameters) {
           dataSource.parameters.endpoint = env.data.AZURE_SEARCH_ENDPOINT;
           dataSource.parameters.authentication.key = env.data.AZURE_SEARCH_KEY;
+          dataSource.parameters.index_name = env.data.AZURE_SEARCH_INDEX_NAME;
           dataSource.parameters.role_information = `${skprompt.toString(
             "utf-8"
           )}`;
-          // dataSource.parameters.role_information = `${skprompt.toString(
-          //   "utf-8"
-          // )} \n\nActions: ${JSON.stringify(template.actions, null, 2)}`;
+          if (dataSource.parameters.embedding_dependency) {
+            dataSource.parameters.embedding_dependency.deployment_name =
+              env.data.OPENAI_EMBEDDING_MODEL;
+          }
         }
       });
     } else {
