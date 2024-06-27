@@ -11,8 +11,6 @@ import { AxiosError } from "axios";
 import { logging } from "../telemetry/loggerManager";
 import { Utils } from "../helpers/utils";
 import { ActionsHelper } from "../helpers/actionsHelper";
-import { AzureAISearchDataSource } from "../dataSources/azureAISearchDataSource";
-import { env } from "process";
 import { Env } from "../env";
 import { container } from "tsyringe";
 
@@ -76,19 +74,6 @@ export class ChatGPTSkill extends BaseAISkill {
       },
     ];
     this.state.temp.input = JSON.stringify(chatHistory);
-
-    // Add the Azure OpenAI Embeddings data source to the prompt
-    this.planner.prompts.addDataSource(
-      new AzureAISearchDataSource({
-        name: this.env.data.AZURE_SEARCH_SOURCE_NAME,
-        indexName: this.env.data.AZURE_SEARCH_INDEX_NAME,
-        azureAISearchApiKey: this.env.data.AZURE_SEARCH_KEY,
-        azureAISearchEndpoint: this.env.data.AZURE_SEARCH_ENDPOINT,
-        azureOpenAIApiKey: this.env.data.OPENAI_KEY,
-        azureOpenAIEndpoint: this.env.data.OPENAI_ENDPOINT,
-        azureOpenAIEmbeddingDeployment: this.env.data.OPENAI_EMBEDDING_MODEL,
-      })
-    );
 
     // Add the Azure AI Search RAG data source to the prompt
     this.planner.prompts.addDataSource(
