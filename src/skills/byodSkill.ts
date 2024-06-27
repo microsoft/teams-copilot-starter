@@ -29,12 +29,14 @@ export class BYODSkill extends BaseAISkill {
   }
 
   /**
-   * Generates a Chat GPT response for the user input.
+   * Generates a Chat GPT response for the user input. 
+   * If documents are uploaded the response will be generated based on the uploaded documents.
+   * Using the temp state to store the input and hash from uploaded document such that it can be used in the completion prompt.
    * @returns {Promise<string>} A promise that resolves to a string containing the generated hint.
    * @throws {Error} If the request to OpenAI was rate limited.
    */
   @usePolicy(BaseAISkill.RetryPolicy)
-  public override async run(input: string): Promise<any> {
+  public override async run(input: string, hashFromUri?: string): Promise<any> {
     logger.debug("Running Bring Your Own Data skill.");
     logger.debug(`Input: ${input}`);
     this.state.temp.input = input;
@@ -42,6 +44,14 @@ export class BYODSkill extends BaseAISkill {
     // Show typing indicator
     Utils.startTypingTimer(this.context, this.state);
 
+    // Set hashFromUri in temp state so it can be used in the completion prompt, where datasource for Vectra is used to get the document content.
+    // The method where this is used is in  `VectraDataSource.renderData()`
+    if (hashFromUri) {
+      this.state.temp.hashFromUploadedDocument = hashFromUri;
+    } else {
+      this.state.temp.hashFromUploadedDocument = undefined
+    }
+    
     try {
       const response = await this.planner.completePrompt(
         this.context,

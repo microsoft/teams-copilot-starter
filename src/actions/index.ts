@@ -8,3 +8,4 @@ export { webRetrieval } from "./webRetrieval";
 export { forgetDocuments } from "./forgetDocuments";
 export { getCompanyStockQuote } from "./getCompanyStockQuote";
 export { formatActionMessage } from "./formatter";
+export { resetIndex } from "./resetIndex";

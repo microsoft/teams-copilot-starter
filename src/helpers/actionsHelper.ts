@@ -89,7 +89,10 @@ export class ActionsHelper {
         url: attachment.content.downloadUrl!,
         fileName: attachment.name!,
       }));
-      state.conversation.uploadedDocuments = attachments;
+      // add the uploaded documents to the state
+      state.conversation.uploadedDocuments =
+        state.conversation.uploadedDocuments ?? [];
+      state.conversation.uploadedDocuments?.push(...attachments);
     }
 
     // Log the uploaded files

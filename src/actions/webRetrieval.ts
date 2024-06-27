@@ -19,6 +19,7 @@ import * as responses from "../resources/responses";
 import * as Errors from "../types/errors";
 import byodAnswerCard from "../adaptiveCards/templates/byodAnswer.json";
 import { ActionsHelper } from "../helpers/actionsHelper";
+import crypto from "crypto";
 
 /**
  * Retrieves web content based on the provided URLs and user input.
@@ -124,25 +125,33 @@ export async function webRetrieval(
   // Remove the urls from the input. Required else AI will state it is not able to retrieve data from an url
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   const inputWithoutUrl = input.replace(urlRegex, "");
-
-  // Run the skill and get the action plan back
-  const response = await questionDocument.run(inputWithoutUrl);
-  if (response) {
-    // Send an adaptive cards with the details
-    await Promise.all(
-      docs.map(async (doc: FileAttachment) => {
-        const card = Utils.renderAdaptiveCard(byodAnswerCard, {
-          docType: "the website",
-          filename: doc.fileName,
-          answer: response,
-        });
-        await context.sendActivity({ attachments: [card] });
-      })
-    );
-  } else {
+  try {
+    if (docs.length > 1) {
+      await context.sendActivity(
+        `You have uploaded ${docs.length} document(s) or website(s). These will be processed now.'`
+      );
+    }
+    // Send an adaptive cards with the details for each document
+    for (const doc of docs) {
+      const hashFromUri = crypto
+        .createHash("sha256")
+        .update(doc.url)
+        .digest("hex");
+      const response = await questionDocument.run(inputWithoutUrl, hashFromUri);
+      if (!response) {
+        return AI.StopCommandName;
+      }
+      const card = Utils.renderAdaptiveCard(byodAnswerCard, {
+        docType: "the website",
+        filename: doc.fileName,
+        answer: response,
+      });
+      await context.sendActivity({ attachments: [card] });
+    }
+  } catch (error: unknown) {
+    logger.error(`Failed running skill: ${(error as Error).message}`);
+    await context.sendActivity("I'm sorry, I could not process the document.");
     return AI.StopCommandName;
   }
-
-  // Continue action command execution
-  return response;
+  return "Provided web details.";
 }
