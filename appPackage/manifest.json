@@ -46,8 +46,8 @@
                             "description": "Start a new chat with Teams Copilot Starter"
                         },
                         {
-                            "title": "Get company info for ",
-                            "description": "Get company information for a given company"
+                            "title": "What is Teams Copilot Starter?",
+                            "description": "Get detailed information about Teams Copilot Starter"
                         },
                         {
                             "title": "Get company details for",
@@ -70,7 +70,7 @@
                 {
                   "id": "searchCmd",
                   "type": "query",
-                  "title": "Teams Copilot Starter",
+                  "title": "Get Company Info",
                   "description": "Get company information from Teams Copilot Starter",
                   "initialRun": false,
                   "fetchTask": false,
