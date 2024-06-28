@@ -1,4 +1,4 @@
-import { ActionPlanner, PredictedSayCommand } from "@microsoft/teams-ai";
+import { ActionPlanner } from "@microsoft/teams-ai";
 import { TurnContext } from "botbuilder";
 import { ApplicationTurnState, CopilotRoles } from "../models/aiTypes";
 import { BaseAISkill } from "./baseAISkill";
@@ -11,8 +11,6 @@ import { AxiosError } from "axios";
 import { logging } from "../telemetry/loggerManager";
 import { Utils } from "../helpers/utils";
 import { ActionsHelper } from "../helpers/actionsHelper";
-import { Env } from "../env";
-import { container } from "tsyringe";
 
 // Get an instance of the Logger singleton object
 const logger = logging.getLogger("bot.TeamsAI");
@@ -39,7 +37,6 @@ const logger = logging.getLogger("bot.TeamsAI");
  * }
  */
 export class ChatGPTSkill extends BaseAISkill {
-  private readonly env: Env = container.resolve<Env>(Env);
   constructor(
     context: TurnContext,
     state: ApplicationTurnState,
