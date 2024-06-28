@@ -117,6 +117,9 @@ export class TeamsAI {
   public static readonly BeforeTurn = "beforeTurn";
   public static readonly AfterTurn = "afterTurn";
 
+  // Handoff url template
+  public static HandoffUrl = "https://teams.microsoft.com/l/chat/0/0?users=28:${botId}&continuation=${continuation}";
+
   private configureAI(botId: string, adapter: TeamsAdapter, storage: Storage, planner: ActionPlanner<ApplicationTurnState>): Application<ApplicationTurnState> {
     const ai = new ApplicationBuilder<ApplicationTurnState>()
       .withStorage(storage)
@@ -162,6 +165,9 @@ export class TeamsAI {
   ) {
     // Create the environment variables
     this.env = container.resolve<Env>(Env);
+
+    // Set up the handoff URL
+    TeamsAI.HandoffUrl = TeamsAI.HandoffUrl.replace("${botId}", this.env.data.BOT_ID ?? "");
 
     // Create the AI application
     this.app = this.configureAI(botAppId, adapter, storage, planner);    

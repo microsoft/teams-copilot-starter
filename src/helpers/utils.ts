@@ -19,6 +19,7 @@ import {
 import { ApplicationTurnState } from "../models/aiTypes";
 import { container } from "tsyringe";
 import { Env } from "../env";
+import { TeamsAI } from "../bot/teamsAI";
 
 const TYPING_TIMER_DELAY = 1000;
 // Define a Utils class
@@ -158,10 +159,12 @@ export class Utils {
     botId: string
   ): Attachment {
     const cardTemplate = Utils.getCompaniesListAdaptiveCardTemplate();
-    const handOffToBotUrl = `https://teams.microsoft.com/l/chat/0/0?users=28:${botId}&continuationToken=${company.id}`;
     return Utils.getAdaptiveCardWithData(cardTemplate, {
       entity: company,
-      handOffToBotUrl: handOffToBotUrl,
+      handOffToBotUrl: `${TeamsAI.HandoffUrl.replace(
+        "${continuation}",
+        company.id
+      )}`,
     });
   }
 
@@ -516,6 +519,8 @@ export class Utils {
     content: string,
     contextCitations: Citation[]
   ): [string, ClientCitation[] | undefined] {
+    const env = container.resolve(Env);
+
     // If the response from AI includes citations, they will be parsed and added to the response
     const citations = contextCitations.map((citation, i) => {
       return {
@@ -525,7 +530,10 @@ export class Utils {
           "@type": "DigitalDocument",
           name: citation.title,
           abstract: Utils.extractSnippet(citation.content, 500),
-          url: citation.url,
+          url: `${TeamsAI.HandoffUrl.replace(
+            "${continuation}",
+            citation.url ?? citation.title ?? ""
+          )}`,
           usageInfo: {
             type: "https://schema.org/Message",
             "@type": "CreativeWork",
