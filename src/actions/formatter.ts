@@ -31,10 +31,19 @@ export async function formatActionMessage(
   }
 
   // If the response from AI includes citations, they will be parsed and added to the response
-  const [contentText, referencedCitations] =
+  // eslint-disable-next-line prefer-const
+  let [contentText, referencedCitations] =
     response.context && response.context.citations.length > 0
       ? Utils.formatCitations(content, response.context.citations)
       : [response.content, null];
+
+  if (referencedCitations && referencedCitations.length > 0) {
+    contentText += `<br><br> ⬇️ ${referencedCitations.length} references<br>`;
+
+    referencedCitations.forEach((citation) => {
+      contentText += `${citation.position}: ${citation.appearance.name}<br>`;
+    });
+  }
 
   // Send the response
   await context.sendActivity({

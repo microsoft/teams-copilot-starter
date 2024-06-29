@@ -21,7 +21,7 @@ import {
   TurnContext,
   Storage,
   Activity,
-  CardFactory
+  CardFactory,
 } from "botbuilder";
 import { ApplicationTurnState, ChatParameters, TData } from "../models/aiTypes";
 import debug from "debug";
@@ -76,6 +76,7 @@ import {
 } from "../adaptiveCards/actions";
 import * as commandNames from "../messageExtensions/commandNames";
 import {
+  findNpmPackage,
   searchCmd, selectItem
 } from "../messageExtensions";
 import { UserHelper } from "../helpers/userHelper";
@@ -389,10 +390,9 @@ export class TeamsAI {
     this.app.handoff(async (context: TurnContext, state: ApplicationTurnState, continuation: string) => {
       // Log the handoff
       this.logger.info(`Handoff received: ${continuation}`);
-      await context.sendActivity("Continuing the conversation started with M365 Copilot.");
-      if (state.conversation.debug) {
-        await context.sendActivity(`Handoff received: ${continuation}`);
-      }
+      await context.sendActivity("Continuing the conversation from another chat/application.");
+      await context.sendActivity(`Handoff received: ${continuation}`);
+           
     });
 
     /******************************************************************
@@ -410,8 +410,11 @@ export class TeamsAI {
     // Listen for /forgetDocument command and then delete the document properties from state
     this.app.adaptiveCards.actionExecute(actionNames.forgetDocuments, forgetDocuments);
 
-    // List for message extension search command
+    // Listen for message extension search command
     this.app.messageExtensions.query(commandNames.searchCmd, async (context: TurnContext, state: ApplicationTurnState, query: Query<Record<string, any>>) => searchCmd(context, state, query, this.planner, this.logger));
+
+    // Listen for message extension select item command
+    this.app.messageExtensions.query(commandNames.findNpmPackageCmd, async (context: TurnContext, state: ApplicationTurnState, query: Query<Record<string, any>>) => findNpmPackage(context, state, query, this.env, this.logger));
 
     // Listen for message extension select item command
     this.app.messageExtensions.selectItem(selectItem);
