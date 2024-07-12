@@ -79,6 +79,7 @@ export class ChatGPTSkill extends BaseAISkill {
 
     // If the user has indexed the Azure AI Search RAG data source, add it to the prompt
     if (
+      process.env.AZURE_SEARCH_ENDPOINT &&
       env.data.AZURE_SEARCH_ENDPOINT &&
       env.data.AZURE_SEARCH_KEY &&
       env.data.AZURE_SEARCH_INDEX_NAME &&
