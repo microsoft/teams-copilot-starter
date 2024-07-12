@@ -109,9 +109,11 @@ See [Skill Customization Guide](./docs/concepts/skill-customization.md) and [Act
 
 1. Duplicate the `.env.dev` in the `env/` folder. Rename the file to `.env.local`.
 
+1. Fill the `OPENAI_KEY`, `OPENAI_ENDPOINT`, `OPENAI_MODEL`, `OPENAI_API_VERSION`, `OPENAI_EMBEDDING_MODEL`, `STORAGE_ACCOUNT_NAME`, `STORAGE_ACCOUNT_KEY`, `AZURE_SEARCH_ENDPOINT` and `AZURE_SEARCH_KEY` variables appropriately.
+
 1. Set `TEAMSFX_ENV` to `local` and set `VECTRA_INDEX_PATH` to `../index` in the `.env.local` file.
 
-1. Fill the `OPENAI_KEY`, `OPENAI_ENDPOINT`, `OPENAI_MODEL`, `OPENAI_API_VERSION`, `OPENAI_EMBEDDING_MODEL`, `STORAGE_ACCOUNT_NAME`, `STORAGE_ACCOUNT_KEY`, `AZURE_SEARCH_ENDPOINT` and `AZURE_SEARCH_KEY` variables appropriately.
+1. Fill the `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_KEY`, `AZURE_SEARCH_INDEX_NAME` and `AZURE_SEARCH_SOURCE_NAME` optional variables if you choose to use Azure AI Search to index your own documents in one of the available Azure storages. Additionally, uncomment the corresponding lines that write these variable into Environment Variables in `teamsapp.<env>.yml` file.
 
 *NOTE*: If you want your prompt template to use a different model other than the default (configured in the `OPENAI_MODEL` environment variable), you can set the model inside the `completion` object that is defined in the `config.json` file in the `prompts` folder.
 

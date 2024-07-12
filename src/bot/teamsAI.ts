@@ -124,31 +124,37 @@ export class TeamsAI {
   private configureAI(botId: string, adapter: TeamsAdapter, storage: Storage, planner: ActionPlanner<ApplicationTurnState>): Application<ApplicationTurnState> {
     const ai = new ApplicationBuilder<ApplicationTurnState>()
       .withStorage(storage)
-      .withLongRunningMessages(adapter, botId)
       .withAIOptions({
         planner: planner,
         allow_looping: false, // set false for sequence augmentation to prevent sending the return value of the last action to the AI.run method
         enable_feedback_loop: true, // enables the user feedback functionality
-      })
-      .withAuthentication(adapter, {
-        settings: {
-            graph: {
-                scopes: [`api://botid-${this.env.data.BOT_ID}/access_as_user`],
-                msalConfig: {
-                    auth: {
-                        clientId: this.env.data.AAD_APP_CLIENT_ID!,
-                        clientSecret: this.env.data.AAD_APP_CLIENT_SECRET!,
-                        authority: `${this.env.data.AAD_APP_OAUTH_AUTHORITY_HOST}/${this.env.data.AAD_APP_TENANT_ID}`
-                    }
-                },
-                signInLink: `https://${this.env.data.BOT_DOMAIN}/auth-start.html`,
-                endOnInvalidMessage: true
-            }
-        },
-        autoSignIn: false, // NOTE: Set to true to enable Single Sign On scenario.
-      })
-      .build();
-    return ai;
+      });
+
+    if (this.env.data.TEAMSFX_ENV !== "testtool") {
+      // Configure application with Long Running Messages
+      ai.withLongRunningMessages(adapter, botId);
+
+      // Configure application with authentication
+      ai.withAuthentication(adapter, {
+          settings: {
+              graph: {
+                  scopes: [`api://botid-${this.env.data.BOT_ID}/access_as_user`],
+                  msalConfig: {
+                      auth: {
+                          clientId: this.env.data.AAD_APP_CLIENT_ID!,
+                          clientSecret: this.env.data.AAD_APP_CLIENT_SECRET!,
+                          authority: `${this.env.data.AAD_APP_OAUTH_AUTHORITY_HOST}/${this.env.data.AAD_APP_TENANT_ID}`
+                      }
+                  },
+                  signInLink: `https://${this.env.data.BOT_DOMAIN}/auth-start.html`,
+                  endOnInvalidMessage: true
+              }
+          },
+          autoSignIn: false, // NOTE: Set to true to enable Single Sign On scenario.
+        });
+    }
+    const app = ai.build();
+    return app;
   };
   
   /**
@@ -196,61 +202,63 @@ export class TeamsAI {
     /**********************************************************************
      * FUNCTION:Handlers for authentication
      **********************************************************************/
-    this.app.authentication.get(this.authConnectionName).onUserSignInSuccess(async (context: TurnContext, state: ApplicationTurnState) => {
-      // Successfully logged in
-      const card = {
-        type: "AdaptiveCard",
-        version: "1.0",
-        body: [
-          {
-            type: "TextBlock",
-            text: "We needed to sign you in.",
-            style: "heading",
-            size: "ExtraLarge",
-            color: "Good"
-          },
-          {
-            type: "TextBlock",
-            text: `Your are now signed in as: ${context.activity.from.name}`
-          },
-        ],
-      };
-    
-      const adaptiveCard = CardFactory.adaptiveCard(card);
-      await context.sendActivity({ attachments: [adaptiveCard] }); 
+    if (this.env.data.TEAMSFX_ENV !== "testtool") {
+      this.app.authentication.get(this.authConnectionName).onUserSignInSuccess(async (context: TurnContext, state: ApplicationTurnState) => {
+        // Successfully logged in
+        const card = {
+          type: "AdaptiveCard",
+          version: "1.0",
+          body: [
+            {
+              type: "TextBlock",
+              text: "We needed to sign you in.",
+              style: "heading",
+              size: "ExtraLarge",
+              color: "Good"
+            },
+            {
+              type: "TextBlock",
+              text: `Your are now signed in as: ${context.activity.from.name}`
+            },
+          ],
+        };
       
-      // Echo back users request
-      if (context.activity.channelData.source.name === "message"
-        && context.activity.text.length > 0) {
-          context.activity.type = ActivityTypes.Message;
-          state.deleteConversationState();
-          await this.app.run(context);
-        } 
-    });
-  
-    this.app.authentication
-      .get(this.authConnectionName)
-      .onUserSignInFailure(async (context: TurnContext, state: ApplicationTurnState, error: AuthError) => {
-          // Failed to login
-          await context.sendActivity("Failed to login");
-          if (state.conversation.debug ?? false) {
-            await context.sendActivity(`Error message: ${error.message}`);
-          }
-    });
+        const adaptiveCard = CardFactory.adaptiveCard(card);
+        await context.sendActivity({ attachments: [adaptiveCard] }); 
+        
+        // Echo back users request
+        if (context.activity.channelData.source.name === "message"
+          && context.activity.text.length > 0) {
+            context.activity.type = ActivityTypes.Message;
+            state.deleteConversationState();
+            await this.app.run(context);
+          } 
+      });
+    
+      this.app.authentication
+        .get(this.authConnectionName)
+        .onUserSignInFailure(async (context: TurnContext, state: ApplicationTurnState, error: AuthError) => {
+            // Failed to login
+            await context.sendActivity("Failed to login");
+            if (state.conversation.debug ?? false) {
+              await context.sendActivity(`Error message: ${error.message}`);
+            }
+      });
+    
+      this.app.message("/signout", async (context: TurnContext, state: ApplicationTurnState) => {
+        await this.app.authentication.signOutUser(context, state, this.authConnectionName);
+    
+        // Echo back users request
+        await context.sendActivity("You have signed out");
+      });
 
-    this.app.message("/signout", async (context: TurnContext, state: ApplicationTurnState) => {
-      await this.app.authentication.signOutUser(context, state, this.authConnectionName);
-  
-      // Echo back users request
-      await context.sendActivity("You have signed out");
-    });
-
-    this.app.message("/signin", async (context: TurnContext, state: ApplicationTurnState) => {
-      const response = await this.app.authentication.signUserIn(context, state, this.authConnectionName);
-  
-      // Echo back users request
-      await context.sendActivity("Sign in request sent");
-    });
+      this.app.message("/signin", async (context: TurnContext, state: ApplicationTurnState) => {
+        const response = await this.app.authentication.signUserIn(context, state, this.authConnectionName);
+    
+        // Echo back users request
+        await context.sendActivity("Sign in request sent");
+      });
+    }
 
     // Listen for new members to join the conversation
     this.app.conversationUpdate(

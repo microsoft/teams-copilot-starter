@@ -24,6 +24,8 @@ deploy:
         # Required custom environment variables
         TEAMSFX_ENV: ${{TEAMSFX_ENV}}
         APP_VERSION: ${{APP_VERSION}}
+        BOT_ID: ${{BOT_ID}}
+        BOT_PASSWORD: ${{BOT_PASSWORD}}         
         BOT_APP_TYPE: ${{BOT_APP_TYPE}}
         OPENAI_KEY: ${{OPENAI_KEY}}
         OPENAI_ENDPOINT: ${{OPENAI_ENDPOINT}}
