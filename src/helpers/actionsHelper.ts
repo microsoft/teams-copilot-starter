@@ -3,6 +3,7 @@ import {
   ActionPlanner,
   Citation,
   ClientCitation,
+  DataSource,
   PromptTemplate,
 } from "@microsoft/teams-ai";
 import { AllowedFileTypes, ApplicationTurnState } from "../models/aiTypes";
@@ -267,6 +268,7 @@ export class ActionsHelper {
     //
     // Use the Azure AI Search data source for RAG over documents
     //
+    //const dataSources = (template.config.completion as any)["data_sources"];
     const dataSources = (template.config.completion as any)["data_sources"];
 
     if (dataSources && dataSources.length > 0 && env.data) {
@@ -285,7 +287,39 @@ export class ActionsHelper {
         }
       });
     } else {
-      logger.error("No data sources found in the environment settings.");
+      logger.info(
+        "No data sources found in the environment settings. Adding default settings for Azure AI Search data source."
+      );
+      dataSources.push({
+        type: "azure_search",
+        parameters: {
+          endpoint: env.data.AZURE_SEARCH_ENDPOINT,
+          authentication: {
+            type: "api_key",
+            key: env.data.AZURE_SEARCH_KEY,
+          },
+          index_name: env.data.AZURE_SEARCH_INDEX_NAME,
+          role_information: `${skprompt.toString("utf-8")}`,
+          embedding_dependency: {
+            type: "deployment_name",
+            deployment_name: env.data.OPENAI_EMBEDDING_MODEL,
+          },
+          semantic_configuration: "default",
+          query_type: "vector_simple_hybrid",
+          fields_mapping: {
+            content_fields_separator: "\n",
+            content_fields: ["content"],
+            filepath_field: "filepath",
+            title_field: "title",
+            url_field: "url",
+            vector_fields: ["contentVector"],
+          },
+          in_scope: false,
+          filter: null,
+          strictness: 5,
+          top_n_documents: 10,
+        },
+      });
     }
 
     return dataSources;

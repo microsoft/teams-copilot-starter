@@ -197,6 +197,7 @@ class Env {
       OPENAI_EMBEDDING_MODEL: z.string().min(1), // For Azure OpenAI this is the name of the embeddings deployment to use.
       STORAGE_ACCOUNT_NAME: z.string().min(1),
       STORAGE_ACCOUNT_KEY: z.string().min(1),
+      STORAGE_SAS_TOKEN: z.string().optional(),
       AZURE_SEARCH_ENDPOINT: z.string().url().optional(),
       AZURE_SEARCH_KEY: z.string().min(1).optional(),
       AZURE_SEARCH_INDEX_NAME: z.string().min(1).optional(),

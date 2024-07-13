@@ -530,10 +530,11 @@ export class Utils {
           "@type": "DigitalDocument",
           name: citation.title,
           abstract: Utils.extractSnippet(citation.content, 500),
-          url: `${TeamsAI.HandoffUrl.replace(
-            "${continuation}",
-            citation.url ?? citation.title ?? ""
-          )}`,
+          url: `${citation.url}${env.data.STORAGE_SAS_TOKEN}`,
+          // url: `${TeamsAI.HandoffUrl.replace(
+          //   "${continuation}",
+          //   citation.url ?? citation.title ?? ""
+          // )}`,
           usageInfo: {
             type: "https://schema.org/Message",
             "@type": "CreativeWork",

@@ -41,7 +41,7 @@ export async function formatActionMessage(
     contentText += `<br><br> ⬇️ ${referencedCitations.length} references<br>`;
 
     referencedCitations.forEach((citation) => {
-      contentText += `${citation.position}: ${citation.appearance.name}<br>`;
+      contentText += `${citation.position}: [${citation.appearance.name}](${citation.appearance.url})<br>`;
     });
   }
 
