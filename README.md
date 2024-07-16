@@ -113,7 +113,7 @@ See [Skill Customization Guide](./docs/concepts/skill-customization.md) and [Act
 
 1. Set `TEAMSFX_ENV` to `local` and set `VECTRA_INDEX_PATH` to `../index` in the `.env.local` file.
 
-1. Fill the `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_KEY`, `AZURE_SEARCH_INDEX_NAME` and `AZURE_SEARCH_SOURCE_NAME` optional variables if you choose to use Azure AI Search to index your own documents in one of the available Azure storages. Additionally, uncomment the corresponding lines that write these variable into Environment Variables in `teamsapp.<env>.yml` file.
+1. Fill the `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_KEY`, `AZURE_SEARCH_INDEX_NAME`, `AZURE_SEARCH_SOURCE_NAME` and `STORAGE_SAS_TOKEN` optional variables if you choose to use Azure AI Search to index your own documents in one of the available Azure storages. Additionally, uncomment the corresponding lines that write these variable into Environment Variables in `teamsapp.<env>.yml` file.
 
 *NOTE*: If you want your prompt template to use a different model other than the default (configured in the `OPENAI_MODEL` environment variable), you can set the model inside the `completion` object that is defined in the `config.json` file in the `prompts` folder.
 
@@ -147,6 +147,7 @@ This action in the pipeline copies the environment variables from the `.env.loca
 | `OPENAI_EMBEDDING_MODEL` | The model to be used for embeddings. For Azure OpenAI this is the name of the deployment to use. This setting is only used when you chat with a document or web content. |
 | `STORAGE_ACCOUNT_NAME` | The name of the storage account |
 | `STORAGE_ACCOUNT_KEY` | The key for the storage account |
+| `STORAGE_SAS_TOKEN` | The SAS token for the Azure Search source documents blob container |
 | `AZURE_SEARCH_ENDPOINT` | The URL endpoint to the Azure AI Search service |
 | `AZURE_SEARCH_KEY` | The key for the Azure AI Search service |
 | `AZURE_SEARCH_INDEX_NAME` | The name of the Azure AI Search index |

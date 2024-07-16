@@ -269,9 +269,10 @@ export class ActionsHelper {
     // Use the Azure AI Search data source for RAG over documents
     //
     //const dataSources = (template.config.completion as any)["data_sources"];
-    const dataSources = (template.config.completion as any)["data_sources"];
+    const dataSources =
+      (template.config.completion as any)["data_sources"] ?? [];
 
-    if (dataSources && dataSources.length > 0 && env.data) {
+    if (dataSources.length > 0 && env.data) {
       dataSources.forEach((dataSource: any) => {
         if (dataSource.type === "azure_search" && dataSource.parameters) {
           dataSource.parameters.endpoint = env.data.AZURE_SEARCH_ENDPOINT;

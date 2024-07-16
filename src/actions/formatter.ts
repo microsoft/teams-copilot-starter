@@ -24,6 +24,24 @@ export async function formatActionMessage(
   }
 
   let content = response.content;
+
+  // try to parse into JSON object to see if there are any unprocessed commands in the returned content
+  try {
+    const plan = JSON.parse(response.content);
+    if (plan.type === "plan") {
+      return AI.UnknownActionName;
+    }
+    if (plan.action && plan.action.name === "SAY") {
+      await context.sendActivity(
+        plan.action.parameters?.text ??
+          "Unfortunatelly, I couldn't process the response. Please try again."
+      );
+      return action ?? AI.StopCommandName;
+    }
+  } catch (e) {
+    // do nothing
+  }
+
   const isTeamsChannel = context.activity.channelId === Channels.Msteams;
 
   if (isTeamsChannel) {
