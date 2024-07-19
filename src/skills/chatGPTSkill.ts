@@ -10,9 +10,15 @@ import { AxiosError } from "axios";
 
 import { logging } from "../telemetry/loggerManager";
 import { Utils } from "../helpers/utils";
+import { ActionsHelper } from "../helpers/actionsHelper";
+import { Env } from "../env";
+import { container } from "tsyringe";
 
 // Get an instance of the Logger singleton object
 const logger = logging.getLogger("bot.TeamsAI");
+
+// Get an instance of the Env singleton object
+const env = container.resolve(Env);
 
 /**
  * Skill that uses OpenAI to generate a response to the user's input.
@@ -71,6 +77,22 @@ export class ChatGPTSkill extends BaseAISkill {
     ];
     this.state.temp.input = JSON.stringify(chatHistory);
 
+    // If the user has indexed the Azure AI Search RAG data source, add it to the prompt
+    if (
+      process.env.AZURE_SEARCH_ENDPOINT &&
+      env.data.AZURE_SEARCH_ENDPOINT &&
+      env.data.AZURE_SEARCH_KEY &&
+      env.data.AZURE_SEARCH_INDEX_NAME &&
+      env.data.AZURE_SEARCH_SOURCE_NAME
+    ) {
+      this.planner.prompts.addDataSource(
+        await ActionsHelper.addAzureAISearchDataSource(
+          AIPrompts.ChatGPT,
+          this.planner
+        )
+      );
+    }
+
     try {
       const response = await this.planner.completePrompt(
         this.context,
@@ -110,7 +132,13 @@ export class ChatGPTSkill extends BaseAISkill {
         return undefined;
       }
 
-      return Utils.extractJsonResponse(response.message?.content);
+      if (!response.message) {
+        logger.error("Chat GPT operation failed. No response received.");
+        await this.context.sendActivity(responses.openAIRateLimited());
+        return undefined;
+      }
+
+      return response.message;
     } catch (error: any) {
       if (error.name === "AxiosError" && error.message.includes("429")) {
         await this.context.sendActivity(responses.openAIRateLimited());

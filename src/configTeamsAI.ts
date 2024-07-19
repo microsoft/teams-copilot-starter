@@ -32,7 +32,10 @@ export function configureTeamsAI(
   logger.info("Configuring Teams AI");
   // Retrieve all configuration settings asynchronously
   logger.info("Retrieving configuration settings for Teams AI");
-  const botAppId = env.data.BOT_ID!;
+  if (!env.data.BOT_ID) {
+    throw new Error("Missing BOT_ID in environment variables");
+  }
+  const botAppId = env.data.BOT_ID;
 
   let model: PromptCompletionModel;
 
@@ -92,10 +95,11 @@ export function configureTeamsAI(
       // Show typing indicator
       await Utils.startTypingTimer(context, state);
 
-      if (state.conversation.promptFolder) {
-        return prompts.getPrompt(state.conversation.promptFolder);
-      }
-      return prompts.getPrompt(env.data.DEFAULT_PROMPT_NAME);
+      const template = state.conversation.promptFolder
+        ? await prompts.getPrompt(state.conversation.promptFolder)
+        : await prompts.getPrompt(env.data.DEFAULT_PROMPT_NAME);
+
+      return template;
     },
   });
 

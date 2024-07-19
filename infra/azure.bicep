@@ -6,6 +6,8 @@ param botResourceBaseName string
 @description('Required when create Azure Bot service')
 param botAadAppClientId string
 
+param location string = resourceGroup().location
+
 @secure()
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
@@ -23,8 +25,16 @@ param teamsAppId string
 
 param botServerfarmsName string = '${botResourceBaseName}plan'
 param botWebAppName string = '${botResourceBaseName}web'
+param botChatHistoryStorageName string = '${botResourceBaseName}sta'
+param storageAccountName string
 
-param location string = resourceGroup().location
+@allowed([
+  'new'
+  'existing'
+])
+param newOrExistingStorageAcct string = (storageAccountName == '') ? 'new' : 'existing'
+
+
 param aadAppClientId string
 param aadAppTenantId string
 param aadAppOauthAuthorityHost string
@@ -39,12 +49,17 @@ param openAIApiVersion string
 param defaultPromptName string
 param storageContainerName string
 param maxTurns string
-param botChatHistoryStorageName string = '${botResourceBaseName}sta'
 param maxFileSize string
 param maxPages string
 param webDataSource string
 param documentDataSource string
 param indexFolderPath string
+@secure()
+param storageSasToken string
+param azureSearchEndpoint string
+@secure()
+param azureSearchKey string
+param azureSearchIndexName string
 
 var oauthAuthority = uri(aadAppOauthAuthorityHost, aadAppTenantId)
 var teamsMobileOrDesktopAppClientId = '1fec8e78-bce4-4aaf-ab1b-5451cc387264'
@@ -70,7 +85,8 @@ resource botAppInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 // Azure Storage that hosts Tab static web site and Bot chat history
-resource botStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+// Deploy Azure Storage resource only if the flag is set to true
+resource botNewStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = if (newOrExistingStorageAcct == 'new') {
   kind: 'StorageV2'
   location: location
   name: botChatHistoryStorageName
@@ -80,6 +96,10 @@ resource botStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   sku: {
     name: storageSKU
   }
+}
+
+resource botStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = if (newOrExistingStorageAcct == 'existing') {
+  name: storageAccountName
 }
 
 // Compute resources for the Bot Web App
@@ -152,8 +172,9 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
     OPENAI_ENDPOINT: openAIEndpoint
     OPENAI_MODEL: openAIModel
     OPENAI_EMBEDDING_MODEL: openAIEmbeddingModel
-    STORAGE_ACCOUNT_NAME: botStorageAccount.name
-    STORAGE_ACCOUNT_KEY: botStorageAccount.listKeys().keys[0].value
+    STORAGE_ACCOUNT_NAME: (newOrExistingStorageAcct == 'new') ? botNewStorageAccount.name : botStorageAccount.name
+    STORAGE_ACCOUNT_KEY: (newOrExistingStorageAcct == 'new') ? botNewStorageAccount.listKeys().keys[0].value : botStorageAccount.listKeys().keys[0].value
+    STORAGE_SAS_TOKEN: storageSasToken
     OPENAI_API_VERSION: openAIApiVersion
     VECTRA_INDEX_PATH: indexFolderPath
     DEFAULT_PROMPT_NAME: defaultPromptName
@@ -165,6 +186,9 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
     MAX_FILE_SIZE: maxFileSize
     MAX_PAGES: maxPages
     RUNNING_ON_AZURE: '1'
+    AZURE_SEARCH_ENDPOINT: azureSearchEndpoint
+    AZURE_SEARCH_KEY: azureSearchKey
+    AZURE_SEARCH_INDEX_NAME: azureSearchIndexName
   }
 }
 
@@ -180,13 +204,13 @@ module azureBotRegistration './botRegistration/azurebot.bicep' = {
 }
 
 // Create a blob service for the Bot chat history
-resource botBlobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
+resource botBlobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = if (newOrExistingStorageAcct == 'new') {
   name: 'default'
   parent: botStorageAccount
 }
 
 // Create a blob container to store Bot chat history
-resource botStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
+resource botStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = if (newOrExistingStorageAcct == 'new') {
   parent: botBlobService
   name: 'conversations'
   properties: {
@@ -197,5 +221,5 @@ resource botStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/con
 // The output will be persisted in .env.{envName}. Visit https://aka.ms/teamsfx-actions/arm-deploy for more details.
 output BOT_AZURE_APP_SERVICE_RESOURCE_ID string = botWebApp.id
 output BOT_DOMAIN string = botWebApp.properties.defaultHostName
-output STORAGE_ACCOUNT_NAME string = botStorageAccount.name
-output STORAGE_ACCOUNT_KEY string = botStorageAccount.listKeys().keys[0].value
+output STORAGE_ACCOUNT_NAME string = (newOrExistingStorageAcct == 'new') ? botNewStorageAccount.name : botStorageAccount.name
+output STORAGE_ACCOUNT_KEY string = (newOrExistingStorageAcct == 'new') ? botNewStorageAccount.listKeys().keys[0].value : botStorageAccount.listKeys().keys[0].value
