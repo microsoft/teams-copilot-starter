@@ -63,6 +63,7 @@ export async function webRetrieval(
   // Add the web urls to the uploaded documents when they are not already in the list
   webSites.forEach((site) => {
     // Remove the anchor from the url as it refers to same site.
+    site.completeUrl = site.fileName;
     site.fileName = site.fileName.split("#")[0];
     site.completeUrl = site.fileName;
     if (
