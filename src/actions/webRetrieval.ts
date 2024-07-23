@@ -64,6 +64,7 @@ export async function webRetrieval(
   webSites.forEach((site) => {
     // Remove the anchor from the url as it refers to same site.
     site.fileName = site.fileName.split("#")[0];
+    site.completeUrl = site.fileName;
     if (
       !state.conversation.uploadedDocuments?.some(
         (doc) => doc.fileName === site.fileName
@@ -143,7 +144,7 @@ export async function webRetrieval(
       }
       const card = Utils.renderAdaptiveCard(byodAnswerCard, {
         docType: "the website",
-        filename: doc.fileName,
+        filename: doc.completeUrl,
         answer: response,
       });
       await context.sendActivity({ attachments: [card] });
