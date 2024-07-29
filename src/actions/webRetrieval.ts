@@ -65,7 +65,6 @@ export async function webRetrieval(
     // Remove the anchor from the url as it refers to same site.
     site.completeUrl = site.fileName;
     site.fileName = site.fileName.split("#")[0];
-    site.completeUrl = site.fileName;
     if (
       !state.conversation.uploadedDocuments?.some(
         (doc) => doc.fileName === site.fileName
