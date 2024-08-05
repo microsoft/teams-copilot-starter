@@ -90,6 +90,7 @@ See [Skill Customization Guide](./docs/concepts/skill-customization.md) and [Act
  To run the bot in your local dev machine, you will need:
 
 - [Node.js](https://nodejs.org/), supported versions: 16, 18. The verified Node version that this project supports is 18.19.0
+- [Yarn](https://yarnpkg.com/), supported version 1.22. 
 - A [Microsoft 365 account for development](https://docs.microsoft.com/microsoftteams/platform/toolkit/accounts) for Microsoft Teams. This account need to be enabled to manually side load Teams App into your Teams Tenant.
 - Visual Studio Code.
 - [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teamsfx-cli)

@@ -45,7 +45,7 @@
         {
             "label": "Start application (Test Tool)",
             "type": "shell",
-            "command": "npm run dev:teamsfx:testtool",
+            "command": "yarn run dev:teamsfx:testtool",
             "isBackground": true,
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -69,7 +69,7 @@
         {
         "label": "Start Test Tool",
         "type": "shell",
-        "command": "npm run dev:teamsfx:launch-testtool",
+        "command": "yarn run dev:teamsfx:launch-testtool",
         "isBackground": true,
         "options": {
             "env": {
@@ -179,7 +179,7 @@
         {
             "label": "Start bot",
             "type": "shell",
-            "command": "npm run dev:teamsfx",
+            "command": "yarn run dev:teamsfx",
             "isBackground": true,
             "options": {
                 "cwd": "${workspaceFolder}/src"
