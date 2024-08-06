@@ -29,6 +29,3 @@ index/
 .teamsapptesttool.yml
 env/.env.testTool
 devTools/*
-
-# .nx files
-.nx/cache
