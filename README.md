@@ -68,7 +68,10 @@ The Teams Copilot Starter is made to support various AI systems for moderating i
 
 ### External Data Sources
 
-External data sources allow the injection of relevant information from external sources into prompts, such as vector databases or cognitive search. A vector data source makes it easy to add [RAG](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to any prompt, allowing for better and more accurate replies from the bot. Teams Copilot Starter comes with a built-in local vector database for Node.js, called Vectra. Using Vectra you can chat with either a website content (must be publicly accessible) or locally uploaded documents in either text (TXT) or PDF format. For each data source, a max number of tokens to use can be specified via `maxTokens` variable. For more information see [Vectra](./docs/concepts/vectra.md) guide.
+External data sources allow the injection of relevant information from external sources into prompts, such as vector databases or cognitive search. A vector data source makes it easy to add [RAG](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to any prompt, allowing for better and more accurate replies from the bot. Teams Copilot Starter comes with two RAG options:
+
+1. A built-in local vector database for Node.js, called Vectra. Using Vectra you can chat with either a website content (must be publicly accessible) or locally uploaded documents in either text (TXT) or PDF format. For each data source, a max number of tokens to use can be specified via `maxTokens` variable. For more information see [Vectra](./docs/concepts/vectra.md) guide.
+2. Azure AI Search, that provides secure information retrieval at scale over user-owned content in traditional and generative AI search applications. For more information, see [What's Azure AI Search?](https://learn.microsoft.com/en-us/azure/search/search-what-is-azure-search). Across the Azure platform, Azure AI Search can integrate with other Azure services in the form of indexers that automate data ingestion/retrieval from Azure data sources, and skillsets that incorporate consumable AI from Azure AI services, such as image and natural language processing, or custom AI that you create in Azure Machine Learning or wrap inside Azure Functions. To build your own Azure AI Search Indexer, follow the steps described in this article: [Create an index in Azure AI Search](https://learn.microsoft.com/en-us/azure/search/search-how-to-create-search-index?tabs=portal).
 
 ### Enable Single Sign-on with authorized access to a secured API
 
@@ -110,9 +113,11 @@ See [Skill Customization Guide](./docs/concepts/skill-customization.md) and [Act
 
 1. Duplicate the `.env.dev` in the `env/` folder. Rename the file to `.env.local`.
 
+1. Fill the `OPENAI_KEY`, `OPENAI_ENDPOINT`, `OPENAI_MODEL`, `OPENAI_API_VERSION`, `OPENAI_EMBEDDING_MODEL`, `STORAGE_ACCOUNT_NAME`, `STORAGE_ACCOUNT_KEY`, `AZURE_SEARCH_ENDPOINT` and `AZURE_SEARCH_KEY` variables appropriately.
+
 1. Set `TEAMSFX_ENV` to `local` and set `VECTRA_INDEX_PATH` to `../index` in the `.env.local` file.
 
-1. Fill the `OPENAI_KEY`, `OPENAI_ENDPOINT`, `OPENAI_MODEL`, `OPENAI_API_VERSION`, `OPENAI_EMBEDDING_MODEL`, `STORAGE_ACCOUNT_NAME`, and `STORAGE_ACCOUNT_KEY` variables appropriately.
+1. Fill the `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_KEY`, `AZURE_SEARCH_INDEX_NAME`, `AZURE_SEARCH_SOURCE_NAME` and `STORAGE_SAS_TOKEN` optional variables if you choose to use Azure AI Search to index your own documents in one of the available Azure storages. Additionally, uncomment the corresponding lines that write these variable into Environment Variables in `teamsapp.<env>.yml` file.
 
 *NOTE*: If you want your prompt template to use a different model other than the default (configured in the `OPENAI_MODEL` environment variable), you can set the model inside the `completion` object that is defined in the `config.json` file in the `prompts` folder.
 
@@ -146,12 +151,17 @@ This action in the pipeline copies the environment variables from the `.env.loca
 | `OPENAI_EMBEDDING_MODEL` | The model to be used for embeddings. For Azure OpenAI this is the name of the deployment to use. This setting is only used when you chat with a document or web content. |
 | `STORAGE_ACCOUNT_NAME` | The name of the storage account |
 | `STORAGE_ACCOUNT_KEY` | The key for the storage account |
+| `STORAGE_SAS_TOKEN` | The SAS token for the Azure Search source documents blob container |
+| `AZURE_SEARCH_ENDPOINT` | The URL endpoint to the Azure AI Search service |
+| `AZURE_SEARCH_KEY` | The key for the Azure AI Search service |
+| `AZURE_SEARCH_INDEX_NAME` | The name of the Azure AI Search index |
 | `VECTRA_INDEX_PATH` | The path of the Vectra database index. This is used for non-production scenarios. When running locally, the value is `../index` and when running in Azure, the value is `D:\\Home\\index`. |
 | `OPENAI_API_VERSION` | This is only used by Azure OpenAI |
 | `DEFAULT_PROMPT_NAME` | The default prompt name. The default is `plan` and refers to the folder name in `prompts/` folder |
 | `STORAGE_CONTAINER_NAME` | The name of the storage container that will store conversation state |
 | `WEBDATA_SOURCE_NAME` | The name of the web data source. If this value is changed, it will also need to be changed in the `prompts/questionWeb/config.json` file |
 | `DOCUMENTDATA_SOURCE_NAME` | The name of the document data source. If this value is changed, it will also need to be changed in the `prompts/questionDocument/config.json` file |
+| `AZURE_SEARCH_SOURCE_NAME` | The name of the Azure AI Search data source property. If this value is changed, it will also need to be changed in the `prompts/chatGPT/config.json` file |
 | `MAX_TURNS` | The maximum number of turns |
 | `MAX_FILE_SIZE` | The maximum file size |
 | `MAX_PAGES` | The maximum number of pages |
@@ -341,21 +351,9 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 You may encounter the following known issues documented and assigned for the futher investigation in the repo's Issues section:
 
-### Issue [#1](https://github.com/microsoft/teams-copilot-starter/issues/1): The Bot's LLM takes only the first document content embeddings from the Vectra data sources when multiple documents are uploaded
+### Issue [#1](https://github.com/microsoft/teams-copilot-starter/issues/15): When using combined action with a url "give me details about Microsoft and summarize https://en.wikipedia.org/wiki/Earth", the webretrieval fails.
 
-If I try to chat with more than one document in the sequence, you won't get the correct respond from the bot starting from the second uploaded document until you reset the system by prompting `/reset` or ask Bot to forget the previously uploaded documents: `forget documents` or `/forget` using the short command.
-
-This issue will be addressed in the upcoming updates and the status of this issue fix will be posted in the Issues section of the repo.
-
-### Issue [#2](https://github.com/microsoft/teams-copilot-starter/issues/2): When multiple users try to chat with their own documents, the Local Vectra Index will contain the documents from all users
-
-If you try to chat with a specific document when running in Azure environment, there are chances that your document will be shared with another user(s).
-
-This issue will be addressed in the upcoming updates and the status of this issue fix will be posted in the Issues section of the repo.
-
-### Issue [#3](https://github.com/microsoft/teams-copilot-starter/issues/3) When more than one document is uploaded, bot returns the same response the same number of times as loaded documents
-
-If you load two or more documents, the bot will give the same result the same number of loaded documents.
+When a prompt of a user contains multiple actions the same prompt is sent to each action. In case of Webretrieval this might lead that the AI is generation the wrong response and will use  the first part of the prompt to answer the question of the retreived website. 
 
 This issue will be addressed in the upcoming updates and the status of this issue fix will be posted in the Issues section of the repo.
 

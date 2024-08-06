@@ -4,4 +4,5 @@ export type FileAttachment = {
   fileName: string;
   blobName?: string | undefined;
   fileHash?: string | undefined;
+  completeUrl?: string | undefined;
 };
