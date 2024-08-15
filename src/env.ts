@@ -217,7 +217,7 @@ class Env {
       MAX_TURNS: z.coerce.number().int().positive().default(10),
       MAX_FILE_SIZE: z.coerce.number().int().positive().default(4096),
       MAX_PAGES: z.coerce.number().int().positive().default(5),
-      ROUTE_UKNOWN_ACTION_TO_SEMANTIC_SEARCH: z.boolean().default(false),
+      ROUTE_UKNOWN_ACTION_TO_SEMANTIC_SEARCH: z.coerce.boolean().default(false),
       OPEN_API_BASE_URL: z.string().url().optional().nullable(),
       USER_TASK_PULL_INTERVAL: z.coerce.number().int().positive().default(60),
       SERVICE_URL: z.string().url().optional().nullable(),
