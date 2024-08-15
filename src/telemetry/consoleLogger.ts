@@ -1,15 +1,17 @@
-import { container } from "tsyringe";
 import { EventEntry, ILogger, LogEntry, MetricEntry } from "../types";
 import { Env } from "../env";
 
 export class ConsoleLogger implements ILogger {
-  private env: Env;
-  constructor() {
-    this.env = container.resolve(Env);
+  constructor() {}
+
+  private getEnvs(): Env {
+    return new Env();
   }
 
   private getMsg(logEntry: LogEntry): string {
-    return `[${logEntry.module}]: [appVersion: ${this.env.data.APP_VERSION}] ${logEntry.message}`;
+    return `[${logEntry.module}]: [appVersion: ${
+      this.getEnvs().data.APP_VERSION
+    }] ${logEntry.message}`;
   }
 
   public getName(): string {
@@ -39,7 +41,7 @@ export class ConsoleLogger implements ILogger {
   public trackEvent(eventEntry: EventEntry): void {
     const msg = `Event Entry %c${eventEntry.name} [%c${
       eventEntry.module
-    }]: [appVersion: ${this.env.data.APP_VERSION}] %c${JSON.stringify(
+    }]: [appVersion: ${this.getEnvs().data.APP_VERSION}] %c${JSON.stringify(
       eventEntry.properties
     )}`;
     console.log(msg);
@@ -48,7 +50,7 @@ export class ConsoleLogger implements ILogger {
   public trackDurationMetric(metricEntry: MetricEntry): void {
     const msg = `Metric Entry %c${metricEntry.name} [%c${
       metricEntry.name
-    }]: [appVersion: ${this.env.data.APP_VERSION}] %c${JSON.stringify(
+    }]: [appVersion: ${this.getEnvs().data.APP_VERSION}] %c${JSON.stringify(
       metricEntry
     )}`;
     console.log(msg);

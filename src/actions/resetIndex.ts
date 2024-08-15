@@ -27,7 +27,7 @@ export async function resetIndex(
   const vectraDS = new VectraDataSource({
     name: env.data.WEBDATA_SOURCE_NAME,
     embeddings: ActionsHelper.getEmbeddingsOptions(),
-    indexFolder: env.data.VECTRA_INDEX_PATH,
+    indexFolder: env.data.VECTRA_INDEX_PATH ?? "",
   });
 
   // Obtain the local index

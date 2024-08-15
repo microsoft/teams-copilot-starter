@@ -6,13 +6,14 @@ import { Env } from "../env";
 
 export class AppInsightLogger implements ILogger {
   private appInsightClient: AppInsightsService | undefined = undefined;
+  private readonly env: Env;
 
-  private env: Env;
   constructor() {
-    this.env = container.resolve(Env);
+    this.env = new Env();
     if (
       this.env.data &&
-      this.env.data.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY
+      this.env.data.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY &&
+      this.env.data.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY !== ""
     ) {
       this.appInsightClient = new AppInsightsService(
         this.env.data.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY

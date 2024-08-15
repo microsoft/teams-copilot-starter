@@ -5,12 +5,8 @@ import * as path from "path";
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
-import {
-  ConfigurationServiceClientCredentialFactory,
-  TurnContext,
-} from "botbuilder";
+import { MemoryStorage } from "botbuilder";
 
-import { AxiosError } from "axios";
 import { container } from "tsyringe";
 import { logging } from "./telemetry/loggerManager";
 import { configureTeamsAI } from "./configTeamsAI";
@@ -18,10 +14,8 @@ import { Env } from "./env";
 import { ConsoleLogger } from "./telemetry/consoleLogger";
 import { AppInsightLogger } from "./telemetry/appInsightLogger";
 import { BlobsStorageLeaseManager } from "./helpers/blobsStorageLeaseManager";
-import { TeamsAdapter } from "@microsoft/teams-ai";
-import * as jwtValidator from "./services/jwtValidator";
-import { getTickerQuote } from "./api/apiTicker";
 import { BlobsStorage } from "botbuilder-azure-blobs";
+import { Logger } from "./telemetry/logger";
 
 // Create an instance of the environment variables
 const envVariables: Env = new Env();
@@ -40,22 +34,20 @@ logging
   .registerLogger(appInsightLogger);
 
 // Get logging
-const logger = logging.getLogger("index");
+const logger = logging.getLogger(envVariables.data.APP_NAME);
 
 // register the environment variables
 container.register<Env>(Env, {
   useValue: envVariables,
 });
 
+// register the logger
+container.register<Logger>(Logger, {
+  useValue: logger,
+});
+
 // Create adapter.
-const adapter = new TeamsAdapter(
-  {},
-  new ConfigurationServiceClientCredentialFactory({
-    MicrosoftAppId: envVariables.data.BOT_ID,
-    MicrosoftAppPassword: envVariables.data.BOT_PASSWORD,
-    MicrosoftAppType: envVariables.data.BOT_APP_TYPE,
-  })
-);
+import adapter from "./adapter";
 
 // Due to bug in teams-ai, sso does not work correctly with BlobsStorage. T
 // The method onUserSignInSuccess in the TeamsAdapter class is not called when using BlobsStorage.
@@ -81,49 +73,16 @@ container.register<BlobsStorageLeaseManager>(BlobsStorageLeaseManager, {
   useValue: storageLeaseManager,
 });
 
+// Conversation references cache
+const conversationReferences = {};
+
 // Create the bot that will handle incoming messages.
-const bot = configureTeamsAI(storage, adapter, logger, envVariables);
-
-// Add a custom response formatter to convert markdown code blocks to <pre> tags
-// addResponseFormatter(bot.app);
-
-// Catch-all for errors.
-const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
-  // This check writes out errors to console log .vs. app insights.
-  // NOTE: In production environment, you should consider logging this to Azure
-  //       application insights.
-  logger.error(
-    `[onTurnError] unhandled error: ${error}, stack: ${error.stack}`
-  );
-
-  if (error.name === "AxiosError") {
-    const msg =
-      `Network Error ${(<AxiosError<any>>error).response?.status}:` +
-        (<AxiosError<any>>error).response?.data?.error?.message ??
-      (<AxiosError<any>>error).response?.statusText ??
-      "unknown error";
-    logger.warn(`[onTurnError] error details: ${msg}`);
-    await context.sendActivity(msg);
-  } else {
-    logger.error(`[onTurnError] unhandled error: ${error}`);
-  }
-
-  // Send a trace activity, which will be displayed in Bot Framework Emulator
-  await context.sendTraceActivity(
-    "OnTurnError Trace",
-    `${error}`,
-    "https://www.botframework.com/schemas/error",
-    "TurnError"
-  );
-
-  // Send a message to the user
-  await context.sendActivity(
-    "There was an error generating your response. Please try again. If the error persists, please contact your support team."
-  );
-};
-
-// Set the onTurnError for the singleton CloudAdapter
-adapter.onTurnError = onTurnErrorHandler;
+const bot = configureTeamsAI(
+  storage,
+  logger,
+  envVariables,
+  conversationReferences
+);
 
 logger.info("Starting bot");
 
@@ -150,11 +109,6 @@ server.post("/api/messages", async (req, res) => {
       }
     });
 });
-
-// Listen for incoming requests to get Ticker.
-// This is a sample API that returns a random quote for a given ticker symbol.
-// The API is protected by a JWT token. The token is validated by the jwtValidator middleware.
-server.get("/api/quotes/:ticker", jwtValidator.validateJwt, getTickerQuote);
 
 server.get(
   "/auth-:name(start|end).html",

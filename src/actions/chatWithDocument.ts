@@ -10,7 +10,6 @@ import { Env } from "../env";
 import { UserHelper } from "../helpers/userHelper";
 import { BYODSkill } from "../skills";
 import { VectraDataSource } from "../dataSources/vectraDataSource";
-import { FileAttachment } from "../models/fileAttachment";
 import * as responses from "../resources/responses";
 import * as Errors from "../types/errors";
 import byodAnswerCard from "../adaptiveCards/templates/byodAnswer.json";
@@ -75,7 +74,7 @@ export async function chatWithDocument(
     new VectraDataSource({
       name: env.data.DOCUMENTDATA_SOURCE_NAME,
       embeddings: ActionsHelper.getEmbeddingsOptions(),
-      indexFolder: env.data.VECTRA_INDEX_PATH,
+      indexFolder: env.data.VECTRA_INDEX_PATH ?? "",
     })
   );
 

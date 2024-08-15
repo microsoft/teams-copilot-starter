@@ -97,6 +97,9 @@
     },
     "azureSearchIndexName": {
       "value": "${{AZURE_SEARCH_INDEX_NAME}}"
+    },
+    "azureSearchSourceName": {
+      "value": "${{AZURE_SEARCH_SOURCE_NAME}}"
     }
   }
 }

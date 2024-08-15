@@ -23,7 +23,6 @@ class Env {
             errors ? `${field}: ${errors.join(", ")}` : field
           )
           .join("\n  ");
-        //this.logger.error(`Missing environment variables:\n  ${errorMessage}`);
         throw new Error(`Missing environment variables:\n  ${errorMessage}`);
       }
     }
@@ -179,42 +178,50 @@ class Env {
 
   private schema = z
     .object({
-      AAD_APP_CLIENT_ID: z.string().optional(),
-      AAD_APP_CLIENT_SECRET: z.string().optional(),
-      AAD_APP_OAUTH_AUTHORITY_HOST: z.string().optional(),
-      AAD_APP_TENANT_ID: z.string().optional(),
+      AAD_APP_CLIENT_ID: z.string().optional().nullable(),
+      AAD_APP_CLIENT_SECRET: z.string().optional().nullable(),
+      AAD_APP_OAUTH_AUTHORITY_HOST: z.string().optional().nullable(),
+      AAD_APP_TENANT_ID: z.string().optional().nullable(),
       TEAMSFX_ENV: z.string().min(1),
+      APP_NAME: z.string().min(1),
       APP_VERSION: z.string().min(1),
-      BOT_ID: z.string().optional(),
-      BOT_PASSWORD: z.string().optional(),
+      BOT_ID: z.string(),
+      BOT_PASSWORD: z.string(),
       BOT_APP_TYPE: z
         .enum(["UserAssignedMsi", "SingleTenant", "MultiTenant"])
         .optional(),
-      BOT_DOMAIN: z.string().optional(),
+      BOT_DOMAIN: z.string().optional().nullable(),
       OPENAI_KEY: z.string().min(1),
       OPENAI_ENDPOINT: z.string().url(),
       OPENAI_MODEL: z.string().min(1), // For Azure OpenAI this is the name of the deployment to use.
       OPENAI_EMBEDDING_MODEL: z.string().min(1), // For Azure OpenAI this is the name of the embeddings deployment to use.
       STORAGE_ACCOUNT_NAME: z.string().min(1),
       STORAGE_ACCOUNT_KEY: z.string().min(1),
-      STORAGE_SAS_TOKEN: z.string().optional(),
-      AZURE_SEARCH_ENDPOINT: z.string().url().optional(),
-      AZURE_SEARCH_KEY: z.string().min(1).optional(),
-      AZURE_SEARCH_INDEX_NAME: z.string().min(1).optional(),
-      AZURE_SEARCH_SOURCE_NAME: z.string().min(1).optional(),
-      OPENAI_TYPE: OpenAIType.optional(),
-      VECTRA_INDEX_PATH: z.string().min(1),
-      OPENAI_API_VERSION: z.string().optional(),
+      STORAGE_SAS_TOKEN: z.string().optional().nullable(),
+      AZURE_SEARCH_ENDPOINT: z.string().url().optional().nullable(),
+      AZURE_SEARCH_KEY: z.string().optional().nullable(),
+      AZURE_SEARCH_INDEX_NAME: z.string().optional().nullable(),
+      AZURE_SEARCH_SOURCE_NAME: z.string().optional().nullable(),
+      OPENAI_TYPE: OpenAIType.optional().nullable(),
+      VECTRA_INDEX_PATH: z.string().optional().nullable(),
+      OPENAI_API_VERSION: z.string().optional().default("2024-02-01"),
       DEFAULT_PROMPT_NAME: z.string().min(1),
       STORAGE_CONTAINER_NAME: z.string().min(1),
       WEBDATA_SOURCE_NAME: z.string().min(1),
       DOCUMENTDATA_SOURCE_NAME: z.string().min(1),
-      APPLICATIONINSIGHTS_INSTRUMENTATION_KEY: z.string().optional(),
-      CUSTOM_API_CLIENT_ID: z.string().optional(),
-      CUSTOM_API_CLIENT_SECRET: z.string().optional(),
+      APPLICATIONINSIGHTS_INSTRUMENTATION_KEY: z
+        .string()
+        .optional()
+        .default("")
+        .nullable(),
       MAX_TURNS: z.coerce.number().int().positive().default(10),
-      MAX_FILE_SIZE: z.coerce.number().int().positive(),
-      MAX_PAGES: z.coerce.number().int().positive(),
+      MAX_FILE_SIZE: z.coerce.number().int().positive().default(4096),
+      MAX_PAGES: z.coerce.number().int().positive().default(5),
+      OPEN_API_BASE_URL: z.string().url().optional().nullable(),
+      USER_TASK_PULL_INTERVAL: z.coerce.number().int().positive().default(60),
+      SERVICE_URL: z.string().url().optional().nullable(),
+      CUSTOM_API_CLIENT_ID: z.string().optional().nullable(),
+      CUSTOM_API_CLIENT_SECRET: z.string().optional().nullable(),
     })
     .superRefine(this.openAIRefiner)
     .superRefine(this.botIDRefiner)

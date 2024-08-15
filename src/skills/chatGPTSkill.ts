@@ -1,3 +1,5 @@
+import { container } from "tsyringe";
+import { Env } from "../env";
 import { ActionPlanner } from "@microsoft/teams-ai";
 import { TurnContext } from "botbuilder";
 import { ApplicationTurnState, CopilotRoles } from "../models/aiTypes";
@@ -11,14 +13,9 @@ import { AxiosError } from "axios";
 import { logging } from "../telemetry/loggerManager";
 import { Utils } from "../helpers/utils";
 import { ActionsHelper } from "../helpers/actionsHelper";
-import { Env } from "../env";
-import { container } from "tsyringe";
 
 // Get an instance of the Logger singleton object
 const logger = logging.getLogger("bot.TeamsAI");
-
-// Get an instance of the Env singleton object
-const env = container.resolve(Env);
 
 /**
  * Skill that uses OpenAI to generate a response to the user's input.
@@ -60,22 +57,29 @@ export class ChatGPTSkill extends BaseAISkill {
     logger.debug("Running Chat GPT skill.");
     logger.debug(`Input: ${input}`);
 
-    const maxTurnsToRemember = await Utils.MaxTurnsToRemember();
-    // get the conversation chat history from the state
-    const cachedHistory = CacheHelper.getChatHistory(
-      this.state,
-      maxTurnsToRemember
-    );
+    if (this.state.temp.useCache) {
+      const maxTurnsToRemember = await Utils.MaxTurnsToRemember();
+      // get the conversation chat history from the state
+      const cachedHistory = CacheHelper.getChatHistory(
+        this.state,
+        maxTurnsToRemember
+      );
 
-    // add the user's prompt to the conversation history
-    const chatHistory = [
-      ...cachedHistory,
-      {
-        role: CopilotRoles.user,
-        content: input,
-      },
-    ];
-    this.state.temp.input = JSON.stringify(chatHistory);
+      // add the user's prompt to the conversation history
+      const chatHistory = [
+        ...cachedHistory,
+        {
+          role: CopilotRoles.user,
+          content: input,
+        },
+      ];
+      this.state.temp.input = JSON.stringify(chatHistory);
+    } else {
+      this.state.temp.input = input;
+    }
+
+    // Get an instance of the Env singleton object
+    const env = container.resolve(Env);
 
     // If the user has indexed the Azure AI Search RAG data source, add it to the prompt
     if (

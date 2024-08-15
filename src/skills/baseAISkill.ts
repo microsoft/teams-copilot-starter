@@ -1,7 +1,6 @@
 import { ActionPlanner, DataSource, PromptManager } from "@microsoft/teams-ai";
 import { TurnContext } from "botbuilder";
 import { ApplicationTurnState } from "../models/aiTypes";
-import EntityInfo from "../models/entityInfo";
 import { ISkill } from "./ISkill";
 import { handleWhen, retry } from "cockatiel";
 import { AxiosError } from "axios";
@@ -74,12 +73,12 @@ export abstract class BaseAISkill implements ISkill {
 
   /**
    * Runs the skill.
-   * @param {string | EntityInfo} input The input to send to OpenAI.
+   * @param {string | any} input The input to send to OpenAI.
    * @returns {Promise<any>} A promise that resolves to the skill's response.
    * @throws {Error} If the request to OpenAI was rate limited.
    * @abstract
    */
-  public abstract run(input: string | EntityInfo): Promise<any>;
+  public abstract run(input: string | any): Promise<any>;
 
   /**
    * Adds external content to the local index.

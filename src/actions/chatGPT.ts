@@ -30,6 +30,9 @@ export async function getSemanticInfo(
   // Get the user's message
   const input = context.activity.text;
 
+  // Enable the use cache for the chatGPTSkill
+  state.temp.useCache = true;
+
   // call Chat GPT Skill to get the generic response
   const chatGPTSkill = new ChatGPTSkill(context, state, planner);
 

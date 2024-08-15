@@ -10,6 +10,7 @@ import {
 } from "@microsoft/teams-ai";
 import { User } from "./user";
 import { FileAttachment } from "./fileAttachment";
+import { ConversationReference } from "botbuilder";
 
 export type TData = Record<string, any | any[]>;
 
@@ -27,7 +28,6 @@ export enum CopilotRoles {
 export interface ConversationState extends DefaultConversationState {
   promptFolder?: string;
   history: Message[];
-  listCompanies?: TData;
   entities?: TData;
   headers?: Record<string, TData>;
   promptMessages?: TData;
@@ -36,6 +36,7 @@ export interface ConversationState extends DefaultConversationState {
   debug: boolean;
   documentIds: string[];
   actions?: ChatCompletionAction[];
+  conversationReferences: Record<string, Partial<ConversationReference>>;
 }
 
 export interface UserState extends DefaultUserState {
@@ -51,6 +52,7 @@ export interface TempState extends DefaultTempState {
   startTime: number;
   typingTimer: NodeJS.Timeout | undefined;
   hashFromUploadedDocument: string | undefined;
+  useCache: boolean;
 }
 
 export type ApplicationTurnState = TurnState<

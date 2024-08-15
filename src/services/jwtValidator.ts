@@ -40,6 +40,9 @@ export const validateJwt = (req: any, res: any, next: any): void => {
   const authHeader = req.headers.authorization;
   if (authHeader !== undefined) {
     const token = authHeader.split(" ")[1];
+    if (audience === null) {
+      return next();
+    }
     const validationOptions = {
       audience, // v2.0 token, ensure to set accessTokenAcceptedVersion: 2, in app registration manifest
     };

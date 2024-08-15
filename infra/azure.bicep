@@ -60,6 +60,8 @@ param azureSearchEndpoint string
 @secure()
 param azureSearchKey string
 param azureSearchIndexName string
+param azureSearchSourceName string
+
 
 var oauthAuthority = uri(aadAppOauthAuthorityHost, aadAppTenantId)
 var teamsMobileOrDesktopAppClientId = '1fec8e78-bce4-4aaf-ab1b-5451cc387264'
@@ -189,6 +191,7 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
     AZURE_SEARCH_ENDPOINT: azureSearchEndpoint
     AZURE_SEARCH_KEY: azureSearchKey
     AZURE_SEARCH_INDEX_NAME: azureSearchIndexName
+    AZURE_SEARCH_SOURCE_NAME: azureSearchSourceName
   }
 }
 

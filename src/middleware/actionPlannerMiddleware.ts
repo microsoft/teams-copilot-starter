@@ -1,4 +1,9 @@
-import { AI, Plan, PredictedDoCommand } from "@microsoft/teams-ai";
+import {
+  AI,
+  Plan,
+  PredictedDoCommand,
+  PredictedSayCommand,
+} from "@microsoft/teams-ai";
 import { TeamsAI } from "../bot/teamsAI";
 import { TurnContext } from "botbuilder";
 import {
@@ -41,28 +46,28 @@ export class ActionPlannerMiddleware {
       );
 
       // Validate that the action plan contains at least one "DO" command
-      if (
-        !plan.commands.some(
-          (c) => c.type === "DO" && (c as PredictedDoCommand).action
-        )
-      ) {
-        this.logger.warn(
-          // eslint-disable-next-line quotes
-          `The action plan does not contain any "DO" command. Will fallback to the default ChatGPT action plan`
-        );
+      // if (
+      //   !plan.commands.some(
+      //     (c) => c.type === "DO" && (c as PredictedDoCommand).action
+      //   )
+      // ) {
+      //   this.logger.warn(
+      //     // eslint-disable-next-line quotes
+      //     `The action plan does not contain any "DO" command. Will fallback to the default ChatGPT action plan`
+      //   );
 
-        // Replace the SAY command with the default ChatGPT action plan
-        plan.commands = plan.commands.filter(
-          (c) => c.type !== "SAY"
-        ) as PredictedDoCommand[];
-        plan.commands.push({
-          type: "DO",
-          action: getSemanticInfo,
-          parameters: {
-            entity: state.temp.input,
-          },
-        } as PredictedDoCommand);
-      }
+      //   // Replace the SAY command with the default ChatGPT action plan
+      //   plan.commands = plan.commands.filter(
+      //     (c) => c.type !== "SAY"
+      //   ) as PredictedDoCommand[];
+      //   plan.commands.push({
+      //     type: "DO",
+      //     action: getSemanticInfo,
+      //     parameters: {
+      //       entity: state.temp.input,
+      //     },
+      //   } as PredictedDoCommand);
+      // }
 
       // Swap places of the "DO" and "SAY" commands
       const newPlan = { ...plan, commands: Utils.swapDoAndSay(plan.commands) };

@@ -41,7 +41,7 @@ export async function forgetDocuments(
     const vectraDS = new VectraDataSource({
       name: env.data.WEBDATA_SOURCE_NAME,
       embeddings: ActionsHelper.getEmbeddingsOptions(),
-      indexFolder: env.data.VECTRA_INDEX_PATH,
+      indexFolder: env.data.VECTRA_INDEX_PATH ?? "",
     });
 
     // delete the uploaded documents from the vectra index

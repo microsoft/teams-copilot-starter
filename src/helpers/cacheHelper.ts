@@ -4,6 +4,7 @@ import { ApplicationTurnState, TData, CopilotRoles } from "../models/aiTypes";
 import { container } from "tsyringe";
 import { User } from "../models/user";
 import { Env } from "../env";
+import { ConversationReference } from "botbuilder";
 
 export type HistoryRecord<T extends string> = Record<T, any[]>;
 
@@ -46,19 +47,20 @@ export class CacheHelper {
     const chatHistoryPropertyName = `${env.data.DEFAULT_PROMPT_NAME}_history`;
     const chatHistory: Message[] =
       state.conversation.history ??
-      (state.conversation as any)[chatHistoryPropertyName]?.map((turn: any) => {
-        if (
-          typeof turn.content === "object" &&
-          turn.content.commands?.length > 0
-        ) {
-          return {
-            role: turn.role,
-            content: turn.content.commands[0].response,
-          };
-        } else {
-          return { role: turn.role, content: turn.content };
-        }
-      }) ??
+      (state.conversation as any)[chatHistoryPropertyName]
+        ?.map((turn: any) => {
+          if (typeof turn.content === "object") {
+            const sayResponse = turn.content.commands?.filter(
+              (c: any) => c.type === "SAY"
+            );
+            return (sayResponse?.length ?? 0) > 0
+              ? sayResponse[0].response
+              : undefined;
+          } else {
+            return { role: turn.role, content: turn.content };
+          }
+        })
+        ?.filter((turn: any) => turn !== undefined) ??
       [];
     const history = chatHistory.filter((c: any) =>
       [CopilotRoles.user, CopilotRoles.copilot, CopilotRoles.system].includes(
@@ -176,7 +178,6 @@ export class CacheHelper {
     state.deleteConversationState();
     state.deleteUserState();
     CacheHelper.clearCurrentUser(state);
-    conversation.listCompanies = undefined;
     conversation.entities = undefined;
     conversation.promptMessages = undefined;
   }
@@ -243,5 +244,44 @@ export class CacheHelper {
     if (state.conversation?.history) {
       state.conversation.history = [];
     }
+  }
+
+  /**
+   * Adds a conversation reference to the conversation references cache.
+   * @param state - The application state cache.
+   * @param conversationReference - The conversation reference to be stored in the conversation references cache.
+   * @returns void
+   */
+  public static addConversationReference(
+    state: ApplicationTurnState,
+    conversationReference: Partial<ConversationReference>
+  ): void {
+    if (
+      !state.conversation?.conversationReferences ||
+      !state.conversation?.conversationReferences[
+        conversationReference.conversation!.id
+      ]
+    ) {
+      state.conversation.conversationReferences = {
+        ...state.conversation.conversationReferences,
+        [conversationReference.conversation!.id]: conversationReference,
+      };
+    }
+  }
+
+  /**
+   * Gets a conversation reference from the conversation references cache.
+   * @param state - The application state cache.
+   * @param conversationKey - The key of the conversation reference to retrieve.
+   * @returns The conversation reference if found, otherwise undefined
+   */
+  public static getConversationReference(
+    state: ApplicationTurnState,
+    conversationKey: string
+  ): Partial<ConversationReference> | undefined {
+    if (state.conversation?.conversationReferences) {
+      return state.conversation.conversationReferences[conversationKey];
+    }
+    return undefined;
   }
 }

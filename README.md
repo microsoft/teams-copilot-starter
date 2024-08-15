@@ -117,7 +117,21 @@ See [Skill Customization Guide](./docs/concepts/skill-customization.md) and [Act
 
 1. Set `TEAMSFX_ENV` to `local` and set `VECTRA_INDEX_PATH` to `../index` in the `.env.local` file.
 
-1. Fill the `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_KEY`, `AZURE_SEARCH_INDEX_NAME`, `AZURE_SEARCH_SOURCE_NAME` and `STORAGE_SAS_TOKEN` optional variables if you choose to use Azure AI Search to index your own documents in one of the available Azure storages. Additionally, uncomment the corresponding lines that write these variable into Environment Variables in `teamsapp.<env>.yml` file.
+1. Fill the `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_INDEX_NAME` and `AZURE_SEARCH_SOURCE_NAME` optional variables if you choose to use Azure AI Search to index your own documents in one of the available Azure storages. Additionally, uncomment the corresponding lines that write these variable into Environment Variables in `teamsapp.<env>.yml` file.
+
+1. Copy the `env.[env].user.template` file into `env.local.user` file for Local environment or to `env.dev.user` for the Dev environment.
+
+1. Fill the following environment variables with the values from your Azure environment.
+
+```yaml
+# These value need to be updated before running provision.
+SECRET_OPENAI_KEY=
+SECRET_STORAGE_ACCOUNT_KEY=
+SECRET_STORAGE_SAS_TOKEN=
+SECRET_APPLICATIONINSIGHTS_INSTRUMENTATION_KEY=
+SECRET_AZURE_SEARCH_KEY=
+SECRET_CUSTOM_API_CLIENT_SECRET=
+```
 
 *NOTE*: If you want your prompt template to use a different model other than the default (configured in the `OPENAI_MODEL` environment variable), you can set the model inside the `completion` object that is defined in the `config.json` file in the `prompts` folder.
 
@@ -133,7 +147,7 @@ When you run the sample using the default TeamsFx launch configurations (i.e. 'D
       target: ./src/.localConfigs
       envs:
         # Required custom environment variables
-        OPENAI_KEY: ${{OPENAI_KEY}}
+        OPENAI_KEY: ${{SECRET_OPENAI_KEY}}
         OPENAI_ENDPOINT: ${{OPENAI_ENDPOINT}}
         ....
 ```

@@ -7,8 +7,6 @@ import {
   ActivityTypes,
   TurnContext,
 } from "botbuilder";
-import EntityInfo from "../models/entityInfo";
-import CompanyInfo from "../models/companyInfo";
 import fetch from "node-fetch";
 import * as ACData from "adaptivecards-templating";
 import {
@@ -58,9 +56,11 @@ export class Utils {
     try {
       // Parse the content to check if it is an Action Plan JSON string
       const actionPlanJson = Utils.ensureJsonResponse(content);
-      if (actionPlanJson && actionPlanJson?.commands) {
-        return actionPlanJson?.commands.find((cmd: any) => cmd.type === "SAY")
-          ?.response;
+      if (actionPlanJson) {
+        return actionPlanJson.commands
+          ? actionPlanJson.commands.find((cmd: any) => cmd.type === "SAY")
+              ?.response
+          : actionPlanJson.find((cmd: any) => cmd.type === "SAY")?.response;
       } else {
         return actionPlanJson?.content ?? content;
       }
@@ -110,18 +110,18 @@ export class Utils {
    * @returns A Messaging Extension Search Result Card
    */
   static createMessageExtensionSearchResultCard(
-    company: CompanyInfo
+    entity: any
   ): MessagingExtensionAttachment {
     // TODO: Use "Adaptive Card Hero Card" since Hero card is considered deprecated
-    const card = CardFactory.heroCard(company.name, [], [], {
-      text: company.address?.city_state,
-      subtitle: company.ticker,
+    const card = CardFactory.heroCard(entity.title, [], [], {
+      text: entity.text,
+      subtitle: entity.subtitle,
     }) as MessagingExtensionAttachment;
     // Set the tap action
-    card.preview = CardFactory.heroCard(company.name, [], [], {
-      tap: { type: "invoke", value: { entity: company } } as CardAction,
-      subtitle: company.ticker,
-      text: company.worldRegion,
+    card.preview = CardFactory.heroCard(entity.title, [], [], {
+      tap: { type: "invoke", value: { entity: entity } } as CardAction,
+      subtitle: entity.subtitle,
+      text: entity.text,
     });
     return card;
   }
@@ -155,28 +155,29 @@ export class Utils {
   }
 
   static createM365SearchResultAdaptiveCard(
-    company: CompanyInfo,
-    botId: string
+    entity: any,
+    botId: string,
+    cardTemplateFile: string
   ): Attachment {
-    const cardTemplate = Utils.getCompaniesListAdaptiveCardTemplate();
+    const cardTemplate = new ACData.Template(cardTemplateFile);
     return Utils.getAdaptiveCardWithData(cardTemplate, {
-      entity: company,
+      entity: entity,
       handOffToBotUrl: `${TeamsAI.HandoffUrl.replace(
         "${continuation}",
-        company.id
+        botId
       )}`,
     });
   }
 
-  static createM365SearchResultHeroCard(company: CompanyInfo): Attachment {
-    const card = CardFactory.heroCard(company?.name, [], [], {
+  static createM365SearchResultHeroCard(entity: any): Attachment {
+    const card = CardFactory.heroCard(entity?.title, [], [], {
       text: "",
     });
     card.content.tap = {
       type: "invoke",
       value: {
         verb: "getSemanticInfo",
-        entity: company,
+        entity: entity,
       },
     };
     return card;
@@ -216,7 +217,7 @@ export class Utils {
    * @param expirationTime The expiration time in seconds.
    * @returns True if the entity has expired, false otherwise.
    */
-  static isEntityExpired(entity: EntityInfo, expirationTime: number): boolean {
+  static isEntityExpired(entity: any, expirationTime: number): boolean {
     const now = new Date();
     const lastUpdated: Date = entity.lastUpdated
       ? new Date(entity.lastUpdated)
@@ -240,25 +241,6 @@ export class Utils {
     return await response.text();
   }
 
-  /**
-   * Creates a list of attachments with detailed information for each company.
-   * @param companyNames List of company information.
-   * @returns List of messaging extension attachments.
-   */
-  static async createCompanyListAttachments(
-    companyNames: CompanyInfo[]
-  ): Promise<MessagingExtensionAttachment[]> {
-    const companyListAttachments: MessagingExtensionAttachment[] = [];
-
-    companyNames?.forEach((company: CompanyInfo) =>
-      companyListAttachments.push(
-        Utils.createMessageExtensionSearchResultCard(company)
-      )
-    );
-
-    return companyListAttachments;
-  }
-
   static findFirstCommonWords(input1: string, input2: string): string {
     // Split the inputs into arrays of words
     const words1 = input1.toLowerCase().match(/\b\w+\b/g) || [];
@@ -270,94 +252,6 @@ export class Utils {
     return commonWords?.length > 0
       ? commonWords[0].charAt(0).toUpperCase() + commonWords[0].slice(1)
       : "";
-  }
-
-  static getCompaniesListAdaptiveCardTemplate(): ACData.Template {
-    // Deliverable adaptive card template
-    const cardTemplate = new ACData.Template({
-      type: "AdaptiveCard",
-      body: [
-        {
-          type: "Container",
-          items: [
-            {
-              type: "ColumnSet",
-              columns: [
-                {
-                  type: "Column",
-                  width: "auto",
-                  items: [
-                    {
-                      type: "Image",
-                      url: "${entity.logoUrl}",
-                      size: "small",
-                    },
-                  ],
-                },
-                {
-                  type: "Column",
-                  width: "stretch",
-                  items: [
-                    {
-                      type: "TextBlock",
-                      text: "${entity.name}",
-                      weight: "Bolder",
-                      size: "Large",
-                      spacing: "None",
-                      wrap: true,
-                      style: "heading",
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          type: "TextBlock",
-          text: "Stock Market: ${if(empty([entity.ticker]), 'N/A', [entity.ticker])}",
-          spacing: "None",
-          size: "Small",
-          wrap: true,
-          isSubtle: true,
-        },
-        {
-          type: "TextBlock",
-          text: "Location: ${entity.worldRegion}",
-          wrap: true,
-          style: "heading",
-        },
-        {
-          type: "TextBlock",
-          text: "Website: ${entity.website}",
-          wrap: true,
-          style: "heading",
-        },
-      ],
-      actions: [
-        {
-          type: "Action.Submit",
-          title: "View Details",
-          data: {
-            verb: "getSemanticInfo",
-            msteams: {
-              type: "task/fetch",
-            },
-            command: "getSemanticInfo",
-            entity: "${entity}",
-          },
-        },
-        {
-          type: "Action.OpenUrl",
-          title: "Handoff to Teams Copilot",
-          url: "${handOffToBotUrl}",
-        },
-      ],
-      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
-      version: "1.4",
-    });
-
-    return cardTemplate;
   }
 
   // Function to extract the text response from the Plan Action Command of type "SAY"
