@@ -179,6 +179,7 @@ This action in the pipeline copies the environment variables from the `.env.loca
 | `MAX_TURNS` | The maximum number of turns |
 | `MAX_FILE_SIZE` | The maximum file size |
 | `MAX_PAGES` | The maximum number of pages |
+| `ROUTE_UKNOWN_ACTION_TO_SEMANTIC_SEARCH` | The boolean flag that sets whether the model routes all unknown actions to the Semantic Info action |
 | `APPLICATIONINSIGHTS_INSTRUMENTATION_KEY` | The key for application insights. This is currently not used in local development, but can be enabled by adding it to the .env.local file and uncommenting the corresponding line in the `teamsapp.local.yml` file |
 | `CUSTOM_API_CLIENT_ID` | The client ID used when using a custom OpenAI API. This is currently not used in local development, but can be enabled by adding it to the .env.local file and uncommenting the corresponding line in the `teamsapp.local.yml` file. |
 | `CUSTOM_API_CLIENT_SECRET` | The client secret used when using a custom OpenAI API. This is currently not used in local development, but can be enabled by adding it to the .env.local file and uncommenting the corresponding line in the `teamsapp.local.yml` file. |
