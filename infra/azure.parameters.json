@@ -100,6 +100,9 @@
     },
     "azureSearchSourceName": {
       "value": "${{AZURE_SEARCH_SOURCE_NAME}}"
+    },
+    "routeUknownToSemanticInfo": {
+      "value": "${{ROUTE_UKNOWN_ACTION_TO_SEMANTIC_SEARCH}}"
     }
   }
 }
