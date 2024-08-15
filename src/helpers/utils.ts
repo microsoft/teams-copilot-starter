@@ -57,10 +57,16 @@ export class Utils {
       // Parse the content to check if it is an Action Plan JSON string
       const actionPlanJson = Utils.ensureJsonResponse(content);
       if (actionPlanJson) {
-        return actionPlanJson.commands
-          ? actionPlanJson.commands.find((cmd: any) => cmd.type === "SAY")
-              ?.response
-          : actionPlanJson.find((cmd: any) => cmd.type === "SAY")?.response;
+        if (Object.prototype.hasOwnProperty.call(actionPlanJson, "commands")) {
+          return actionPlanJson.commands.find((cmd: any) => cmd.type === "SAY")
+            ?.response;
+        }
+        if (Object.prototype.hasOwnProperty.call(actionPlanJson, "action")) {
+          return actionPlanJson.action.name === "SAY"
+            ? actionPlanJson.action.parameters?.text
+            : content;
+        }
+        return actionPlanJson.find((cmd: any) => cmd.type === "SAY")?.response;
       } else {
         return actionPlanJson?.content ?? content;
       }

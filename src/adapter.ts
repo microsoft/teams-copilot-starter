@@ -16,8 +16,11 @@ import { AppInsightLogger } from "./telemetry/appInsightLogger";
 
 let adapter: CloudAdapter;
 
-// resolve the environment variables
-const env = container.resolve(Env);
+// create environment variables
+const env = new Env();
+
+// Get the current environment
+const currentEnv = env.data?.TEAMSFX_ENV ?? process.env.TEAMSFX_ENV;
 
 // Configure logging
 const consoleLogger = new ConsoleLogger();
@@ -33,15 +36,16 @@ logging
   .registerLogger(appInsightLogger);
 
 // Get logging
-const logger = logging.getLogger(env.data.APP_NAME);
+const logger = logging.getLogger("Bot");
 
-if (env.data.TEAMSFX_ENV === "testtool") {
+if (currentEnv === "testtool") {
   // Create adapter for Test Tool environment.
   const config = {
-    MicrosoftAppId: env.data.BOT_ID!,
-    MicrosoftAppType: env.data.BOT_APP_TYPE!,
-    MicrosoftAppTenantId: env.data.AAD_APP_TENANT_ID!,
-    MicrosoftAppPassword: env.data.BOT_PASSWORD!,
+    MicrosoftAppId: env.data?.BOT_ID ?? process.env.BOT_ID,
+    MicrosoftAppType: env.data?.BOT_APP_TYPE ?? process.env.BOT_APP_TYPE,
+    MicrosoftAppTenantId:
+      env.data?.AAD_APP_TENANT_ID ?? process.env.AAD_APP_TENANT_ID,
+    MicrosoftAppPassword: env.data?.BOT_PASSWORD ?? process.env.BOT_PASSWORD,
   };
 
   const botFrameworkAuthentication =
@@ -58,9 +62,9 @@ if (env.data.TEAMSFX_ENV === "testtool") {
   adapter = new TeamsAdapter(
     {},
     new ConfigurationServiceClientCredentialFactory({
-      MicrosoftAppId: env.data.BOT_ID,
-      MicrosoftAppPassword: env.data.BOT_PASSWORD,
-      MicrosoftAppType: env.data.BOT_APP_TYPE,
+      MicrosoftAppId: env.data?.BOT_ID ?? process.env.BOT_ID,
+      MicrosoftAppPassword: env.data?.BOT_PASSWORD ?? process.env.BOT_PASSWORD,
+      MicrosoftAppType: env.data?.BOT_APP_TYPE ?? process.env.BOT_APP_TYPE,
     })
   );
 }

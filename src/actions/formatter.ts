@@ -3,8 +3,6 @@ import { AI, Message, PredictedSayCommand } from "@microsoft/teams-ai";
 import { Utils } from "../helpers/utils";
 import { AIEntity } from "@microsoft/teams-ai/lib/actions";
 import { ApplicationTurnState } from "../models/aiTypes";
-import { container } from "tsyringe";
-import { Env } from "../env";
 
 /**
  * Formats the response from the AI and sends it to the user.
