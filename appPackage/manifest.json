@@ -49,8 +49,8 @@
                             "description": "Get detailed information about Teams Copilot Starter"
                         },
                         {
-                            "title": "Get company details for",
-                            "description": "Get financial detailed information for a given company"
+                            "title": "Summarize the website",
+                            "description": "Summarize the content of a website"
                         },
                         {
                             "title": "Analyze document",
@@ -69,40 +69,21 @@
                 {
                   "id": "searchCmd",
                   "type": "query",
-                  "title": "Company Info",
-                  "description": "Get company information for the given company name",
-                  "semanticDescription": "Retrieves the company information for the given company name",
+                  "title": "Help",
+                  "description": "Search for help topics",
+                  "semanticDescription": "Search for help topics",
                   "context": [
                       "compose",
                       "commandBox"
                   ],
                   "parameters": [
                     {
-                        "name": "companyName",
-                        "title": "Company name",
-                        "description": "Enter a company name here",
+                        "name": "topic",
+                        "title": "Topic",
+                        "description": "Enter the topic you want help with",
                         "inputType": "text"
                     }
                   ]
-                },
-                {
-                    "id": "findNpmPackage",
-                    "context": [
-                        "compose",
-                        "commandBox"
-                    ],
-                    "description": "Search npm package by the npm package name",
-                    "title": "Npm Package",
-                    "type": "query",
-                    "semanticDescription": "Search for npm package for the given npm package name",
-                    "parameters": [
-                        {
-                            "name": "npmPackageName",
-                            "title": "Npm Package Name",
-                            "description": "Enter the name of the npm package to be searched",
-                            "inputType": "text"
-                        }
-                    ]
                 }
             ]
         }

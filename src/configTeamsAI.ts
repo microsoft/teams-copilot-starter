@@ -102,7 +102,7 @@ export function configureTeamsAI(
   const bot = new TeamsAI(storage, planner, conversationReferences);
 
   // Create the Teams AI Action Planner Middleware
-  const actionPlannerMiddleware = new ActionPlannerMiddleware(bot, logger);
+  const actionPlannerMiddleware = new ActionPlannerMiddleware(bot, logger, env);
 
   // Attach the middleware to the Teams AI bot's Plan ready action
   actionPlannerMiddleware.attachMiddleware(AI.PlanReadyActionName);
