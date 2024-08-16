@@ -2,7 +2,7 @@ import { ActivityTypes, Channels, TurnContext } from "botbuilder";
 import { AI, Message, PredictedSayCommand } from "@microsoft/teams-ai";
 import { Utils } from "../helpers/utils";
 import { AIEntity } from "@microsoft/teams-ai/lib/actions";
-import { ApplicationTurnState } from "../models/aiTypes";
+import { ApplicationTurnState, RetryCommandName } from "../models/aiTypes";
 
 /**
  * Formats the response from the AI and sends it to the user.
@@ -26,6 +26,11 @@ export async function formatActionMessage(
   }
 
   let content = Utils.extractJsonResponse(response.content);
+
+  // If the response from AI includes citations, but the content doesn't include them, retry the action
+  if (response.context && !Utils.isCitationsIncluded(content)) {
+    return RetryCommandName;
+  }
 
   const isTeamsChannel =
     context.activity.channelId === Channels.Msteams && sendBackToUser;

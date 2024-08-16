@@ -53,9 +53,19 @@ export class CacheHelper {
             const sayResponse = turn.content.commands?.filter(
               (c: any) => c.type === "SAY"
             );
-            return (sayResponse?.length ?? 0) > 0
-              ? sayResponse[0].response
-              : undefined;
+            const doCommand = turn.content.commands?.filter(
+              (c: any) => c.type === "DO"
+            );
+            if ((sayResponse?.length ?? 0) > 0) {
+              return sayResponse[0].response;
+            }
+            if ((doCommand?.length ?? 0) > 0) {
+              return {
+                role: turn.role,
+                content: `action: ${doCommand[0].action}`,
+              };
+            }
+            return undefined;
           } else {
             return { role: turn.role, content: turn.content };
           }

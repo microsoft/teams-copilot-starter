@@ -340,6 +340,15 @@ export class Utils {
   }
 
   /**
+   * Checks if the content includes citations.
+   * @param {string} content The content to check for citations.
+   * @returns {boolean} True if citations are included, false otherwise.
+   */
+  static isCitationsIncluded(content: string): boolean {
+    return /\[doc\d+\]/.test(content);
+  }
+
+  /**
    * Manually start a timer to periodically send "typing" activities.
    * @remarks
    * The timer waits 1000ms to send its initial "typing" activity and then send an additional
@@ -430,7 +439,7 @@ export class Utils {
           "@type": "DigitalDocument",
           name: citation.title,
           abstract: Utils.extractSnippet(citation.content, 500),
-          url: `${citation.url}${env.data.STORAGE_SAS_TOKEN}`,
+          url: `${citation.url}?${env.data.STORAGE_SAS_TOKEN}`,
           // url: `${TeamsAI.HandoffUrl.replace(
           //   "${continuation}",
           //   citation.url ?? citation.title ?? ""

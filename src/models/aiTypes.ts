@@ -53,6 +53,7 @@ export interface TempState extends DefaultTempState {
   typingTimer: NodeJS.Timeout | undefined;
   hashFromUploadedDocument: string | undefined;
   useCache: boolean;
+  retryCount: number;
 }
 
 export type ApplicationTurnState = TurnState<
@@ -92,3 +93,5 @@ export const AllowedFileTypes = [
  * to execute the current plan.
  */
 export const CompletedCommandName = "DONE";
+
+export const RetryCommandName = "RETRY";

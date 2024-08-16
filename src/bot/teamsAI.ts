@@ -24,7 +24,7 @@ import {
   TeamsInfo,
   ConversationReference,
 } from "botbuilder";
-import { ApplicationTurnState, ChatParameters } from "../models/aiTypes";
+import { ApplicationTurnState, ChatParameters, CopilotRoles } from "../models/aiTypes";
 import debug from "debug";
 import { Utils } from "../helpers/utils";
 import * as responses from "../resources/responses";
@@ -571,6 +571,9 @@ export class TeamsAI {
       // Add the conversation reference to the storage
       this.addConversationReference(context.activity, state);
 
+      // Reset the retry count
+      state.temp.retryCount = 0;
+
       // Continue processing the request
       return true;
     });
@@ -579,6 +582,14 @@ export class TeamsAI {
     // In order for it to be available for the next request from the conversation
     this.app.turn(TeamsAI.AfterTurn, async (context: TurnContext, state: ApplicationTurnState) => {
       try {
+        const chatHistory = CacheHelper.getChatHistory(state, 10);
+        // if the assistant response is missing, remove the first user's prompt
+        chatHistory.forEach((item, index) => {
+          if (item.role === CopilotRoles.user && chatHistory[index + 1]?.role !== CopilotRoles.copilot) {
+            chatHistory.shift();
+            state.temp.input = JSON.stringify(chatHistory);
+          }
+        });
         if (state.temp.leaseId) {
           // Release the lease for the conversation blob
           await this.stateStorageManager.releaseLeaseAsync(this.getConversationKey(context.activity), state.temp.leaseId); 

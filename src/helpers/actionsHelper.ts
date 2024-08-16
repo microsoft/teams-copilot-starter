@@ -213,7 +213,7 @@ export class ActionsHelper {
           endpoint: env.data.AZURE_SEARCH_ENDPOINT,
           index_name: env.data.AZURE_SEARCH_INDEX_NAME,
           semantic_configuration: "default",
-          query_type: "vector_simple_hybrid",
+          query_type: "vector_semantic_hybrid",
           fields_mapping: {
             content_fields_separator: "\n",
             content_fields: ["content"],

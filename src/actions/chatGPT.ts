@@ -1,6 +1,6 @@
 import { TurnContext } from "botbuilder";
 import { AI, ActionPlanner } from "@microsoft/teams-ai";
-import { ApplicationTurnState } from "../models/aiTypes";
+import { ApplicationTurnState, RetryCommandName } from "../models/aiTypes";
 import { ChatGPTSkill } from "../skills";
 import { Utils } from "../helpers/utils";
 import { UserHelper } from "../helpers/userHelper";
@@ -30,8 +30,8 @@ export async function getSemanticInfo(
   // Get the user's message
   const input = context.activity.text;
 
-  // Enable the use cache for the chatGPTSkill
-  state.temp.useCache = true;
+  // Disable the use cache for the Semantic Info action as it's a monologue action
+  state.temp.useCache = false;
 
   // call Chat GPT Skill to get the generic response
   const chatGPTSkill = new ChatGPTSkill(context, state, planner);
@@ -42,7 +42,14 @@ export async function getSemanticInfo(
     logger.info(`Chat response sent: '${response.content}'`);
 
     // Send the formatted response that may include the reference document citations
-    return await formatActionMessage(context, state, response);
+    const result = await formatActionMessage(context, state, response);
+    if (result === RetryCommandName && state.temp.retryCount < 3) {
+      // Retry the action when the LLM response contain citations, but the content doesn't include them
+      state.temp.retryCount++;
+      logger.warn(`Retrying the action for the ${state.temp.retryCount} time`);
+      return await getSemanticInfo(context, state, planner);
+    }
+    return result;
   } else {
     // No adaptive card found
     logger.info(`No response from GPT has been generated for '${input}'`);
