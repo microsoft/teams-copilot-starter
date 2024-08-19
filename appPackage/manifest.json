@@ -41,24 +41,20 @@
                     ],
                     "commands": [
                         {
-                            "title": "/newchat",
-                            "description": "Start a new chat with the Copilot"
+                            "title": "/Newchat",
+                            "description": "Start a new chat with UAL Copilot Starter"
                         },
                         {
-                            "title": "How to start an oven?",
-                            "description": "Get detailed instructions on how to start an oven"
+                            "title": "What is the UA privacy policy?",
+                            "description": "Get detailed information about United Airlines' Privacy Policy"
                         },
                         {
-                            "title": "Dishwasher cleaning procedure",
-                            "description": "Get detailed instructions on how to clean a dishwasher"
+                            "title": "Show the Guidelines for COVID-19",
+                            "description": "Get Official Guidelines for COVID-19"
                         },
                         {
-                            "title": "Workplace harassment guidelines",
-                            "description": "Get detailed information on workplace harassment guidelines"
-                        },
-                        {
-                            "title": "What is Open Door Policy?",
-                            "description": "Get detailed information on Open Door Policy from Team Member Handbook"
+                            "title": "Show MileagePlus requirements",
+                            "description": "Provides information about United MileagePlus requirements"
                         }
                     ]
                 }
@@ -74,8 +70,8 @@
                   "id": "searchCmd",
                   "type": "query",
                   "title": "Customer Service",
-                  "description": "Get response from customer service",
-                  "semanticDescription": "Get response from customer service",
+                  "description": "Get customer service information for United Airlines",
+                  "semanticDescription": "Get customer service information for United Airlines",
                   "context": [
                       "compose",
                       "commandBox"
