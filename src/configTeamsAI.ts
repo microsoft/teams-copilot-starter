@@ -85,7 +85,7 @@ export function configureTeamsAI(
       planner: ActionPlanner<ApplicationTurnState>
     ) => {
       // Send the waiting message before the plan is ready
-      await context.sendActivity(responses.waitingForResponse());
+      // await context.sendActivity(responses.waitingForResponse());
 
       // Show typing indicator
       await Utils.startTypingTimer(context, state);

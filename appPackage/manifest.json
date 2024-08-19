@@ -4,7 +4,7 @@
     "version": "${{APP_VERSION}}",
     "id": "${{TEAMS_APP_ID}}",
     "developer": {
-        "name": "Modern Work, ISE",
+        "name": "Microsoft",
         "websiteUrl": "https://www.example.com",
         "privacyUrl": "https://www.example.com/privacy",
         "termsOfUseUrl": "https://www.example.com/termofuse"
@@ -41,20 +41,24 @@
                     ],
                     "commands": [
                         {
-                            "title": "/Newchat",
-                            "description": "Start a new chat with Teams Copilot Starter"
+                            "title": "/newchat",
+                            "description": "Start a new chat with the Copilot"
                         },
                         {
-                            "title": "What is Teams Copilot Starter?",
-                            "description": "Get detailed information about Teams Copilot Starter"
+                            "title": "How to start an oven?",
+                            "description": "Get detailed instructions on how to start an oven"
                         },
                         {
-                            "title": "Summarize the website",
-                            "description": "Summarize the content of a website"
+                            "title": "Dishwasher cleaning procedure",
+                            "description": "Get detailed instructions on how to clean a dishwasher"
                         },
                         {
-                            "title": "Analyze document",
-                            "description": "Analyze the uploaded document's content"
+                            "title": "Workplace harassment guidelines",
+                            "description": "Get detailed information on workplace harassment guidelines"
+                        },
+                        {
+                            "title": "What is Open Door Policy?",
+                            "description": "Get detailed information on Open Door Policy from Team Member Handbook"
                         }
                     ]
                 }
@@ -69,9 +73,9 @@
                 {
                   "id": "searchCmd",
                   "type": "query",
-                  "title": "Help",
-                  "description": "Search for help topics",
-                  "semanticDescription": "Search for help topics",
+                  "title": "Customer Service",
+                  "description": "Get response from customer service",
+                  "semanticDescription": "Get response from customer service",
                   "context": [
                       "compose",
                       "commandBox"
@@ -80,7 +84,7 @@
                     {
                         "name": "topic",
                         "title": "Topic",
-                        "description": "Enter the topic you want help with",
+                        "description": "Enter the topic you want to know about",
                         "inputType": "text"
                     }
                   ]

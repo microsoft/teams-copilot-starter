@@ -60,6 +60,14 @@ export class ActionPlannerMiddleware {
             `The action plan does not contain any "DO" command. Will fallback to the default ChatGPT action plan`
           );
 
+          // Send the user quick response and continue with the default ChatGPT action plan
+          const sayCommand = plan.commands.find(
+            (c) => c.type === "SAY"
+          ) as PredictedSayCommand;
+          if (sayCommand && sayCommand.response?.content) {
+            await context.sendActivity(sayCommand.response.content);
+          }
+
           // Replace the SAY command with the default ChatGPT action plan
           plan.commands = plan.commands.filter(
             (c) => c.type !== "SAY"

@@ -43,12 +43,12 @@ export async function getSemanticInfo(
 
     // Send the formatted response that may include the reference document citations
     const result = await formatActionMessage(context, state, response);
-    if (result === RetryCommandName && state.temp.retryCount < 3) {
-      // Retry the action when the LLM response contain citations, but the content doesn't include them
-      state.temp.retryCount++;
-      logger.warn(`Retrying the action for the ${state.temp.retryCount} time`);
-      return await getSemanticInfo(context, state, planner);
-    }
+    // if (result === RetryCommandName && state.temp.retryCount < 3) {
+    //   // Retry the action when the LLM response contain citations, but the content doesn't include them
+    //   state.temp.retryCount++;
+    //   logger.warn(`Retrying the action for the ${state.temp.retryCount} time`);
+    //   return await getSemanticInfo(context, state, planner);
+    // }
     return result;
   } else {
     // No adaptive card found
