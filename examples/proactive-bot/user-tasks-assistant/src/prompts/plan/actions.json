@@ -1,0 +1,47 @@
+[
+  {
+    "name": "debugOn",
+    "description": "Turns on the debug mode for the bot. This will enable the bot to send debug messages back to the user."
+  },
+  {
+    "name": "debugOff",
+    "description": "Turns off the debug mode for the bot. This will disable the bot from sending debug messages back to the user."
+  },
+  {
+    "name": "getSemanticInfo",
+    "description": "Retrieves the GPT response for the user's prompt. It may include the summary, key points, and other relevant information about the user's query.",
+    "canRunWith": [],
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "type": "string",
+          "description": "The subject entity for which the GPT response is being retrieved"
+        }
+      },
+      "required": ["entity"]
+    }
+  },
+  {
+    "name": "chatWithDocument",
+    "description": "Summarizes or extracts key points from the uploaded document or documents. Allows user to ask questions against the uploaded documents"
+  },
+  {
+    "name": "webRetrieval",
+    "description": "When the user inputs a web link with their query, extract relevant information from the webpage and promptly delivers accurate answers to the user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "type": "string",
+          "description": "The URL of the webpage from which the information is being retrieved. The URL should be a valid URL."
+        }
+      },
+      "required": ["entity"]
+    }
+  },
+  {
+    "name": "forgetDocuments",
+    "description": "Forgets (unloads) all uploaded documents from the conversation state"
+  }
+]

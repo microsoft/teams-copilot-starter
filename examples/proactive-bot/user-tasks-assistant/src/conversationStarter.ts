@@ -3,6 +3,7 @@ import { TeamsAI } from "./bot/teamsAI";
 import {
   Activity,
   ActivityTypes,
+  CloudAdapter,
   ConversationAccount,
   ConversationParameters,
   ConversationReference,
@@ -15,6 +16,8 @@ import { Env } from "./env";
 
 // Create an instance of the environment variables
 const env: Env = new Env();
+
+const serviceUrl = "https://smba.trafficmanager.net/amer/";
 
 /**
  * Start a conversation with the user.
@@ -62,7 +65,6 @@ export async function startConversation(
     try {
       const botAppId = env.data.BOT_ID!; // bot's App ID
       const channelId = ""; // Empty string for creating a new conversation
-      const serviceUrl = env.data.SERVICE_URL!; // The service URL for the bot
 
       // Define the initial activity as a complete Activity object
       const initialActivity: Activity = {
@@ -157,13 +159,12 @@ export async function startConversation(
 export async function notifyUserTasks(
   userTasks: any[],
   bot: TeamsAI,
-  adapter: TeamsAdapter,
+  adapter: TeamsAdapter | CloudAdapter,
   logger: Logger
 ): Promise<void> {
   try {
     const botAppId = env.data.BOT_ID!; // bot's App ID
     const channelId = ""; // Empty string for creating a new conversation
-    const serviceUrl = env.data.SERVICE_URL!; // The service URL for the bot
     const userTaskAction = "userTask:Individual";
 
     userTasks.forEach(async (task: any) => {

@@ -2,76 +2,46 @@
 import "reflect-metadata";
 import * as restify from "restify";
 import * as path from "path";
-
-// Import required bot services.
-// See https://aka.ms/bot-services to learn more about the different parts of a bot.
-import { MemoryStorage } from "botbuilder";
-
 import { container } from "tsyringe";
-import { logging } from "./telemetry/loggerManager";
 import { configureTeamsAI } from "./configTeamsAI";
 import { Env } from "./env";
-import { ConsoleLogger } from "./telemetry/consoleLogger";
-import { AppInsightLogger } from "./telemetry/appInsightLogger";
 import { BlobsStorageLeaseManager } from "./helpers/blobsStorageLeaseManager";
 import { BlobsStorage } from "botbuilder-azure-blobs";
 import { Logger } from "./telemetry/logger";
+import adapter from "./adapter";
+import { MemoryStorage } from "botbuilder";
 
 // Create an instance of the environment variables
-const envVariables: Env = new Env();
-
-// Configure logging
-const consoleLogger = new ConsoleLogger();
-const appInsightLogger = new AppInsightLogger();
-
-logging
-  .configure({
-    minLevels: {
-      "": "trace",
-    },
-  })
-  .registerLogger(consoleLogger)
-  .registerLogger(appInsightLogger);
+const envVariables: Env = container.resolve(Env);
 
 // Get logging
-const logger = logging.getLogger(envVariables.data.APP_NAME);
-
-// register the environment variables
-container.register<Env>(Env, {
-  useValue: envVariables,
-});
-
-// register the logger
-container.register<Logger>(Logger, {
-  useValue: logger,
-});
-
-// Create adapter.
-import adapter from "./adapter";
+const logger = container.resolve(Logger);
 
 // Due to bug in teams-ai, sso does not work correctly with BlobsStorage. T
 // The method onUserSignInSuccess in the TeamsAdapter class is not called when using BlobsStorage.
 // Therefore, MemoryStorage is used instead for the SSO use case.
 // See: https://github.com/microsoft/teams-ai/issues/1457
+let storage: BlobsStorage | MemoryStorage;
+if (envVariables.isProvided("STORAGE_ACCOUNT_NAME")) {
+  // NOTE: Comment out the following lines (68-72) to use MemoryStorage instead of BlobsStorage to enable SSO for now
+  logger.info("Creating BlobsStorage");
+  storage = new BlobsStorage(
+    `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
+    envVariables.data.STORAGE_CONTAINER_NAME!
+  );
 
-// NOTE: Comment out the following lines (68-72) to use MemoryStorage instead of BlobsStorage to enable SSO for now
-logger.info("Creating BlobsStorage");
-const storage = new BlobsStorage(
-  `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
-  envVariables.data.STORAGE_CONTAINER_NAME!
-);
+  const storageLeaseManager = new BlobsStorageLeaseManager(
+    `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
+    `${envVariables.data.STORAGE_CONTAINER_NAME!}-state-manager`
+  );
 
-// NOTE: Uncomment the following line to use MemoryStorage instead of BlobsStorage to enable SSO for now
-// const storage = new MemoryStorage();
-
-const storageLeaseManager = new BlobsStorageLeaseManager(
-  `DefaultEndpointsProtocol=https;AccountName=${envVariables.data.STORAGE_ACCOUNT_NAME};AccountKey=${envVariables.data.STORAGE_ACCOUNT_KEY};EndpointSuffix=core.windows.net`,
-  `${envVariables.data.STORAGE_CONTAINER_NAME!}-state-manager`
-);
-
-container.register<BlobsStorageLeaseManager>(BlobsStorageLeaseManager, {
-  useValue: storageLeaseManager,
-});
+  container.register<BlobsStorageLeaseManager>(BlobsStorageLeaseManager, {
+    useValue: storageLeaseManager,
+  });
+} else {
+  // Use MemoryStorage instead of BlobsStorage to enable SSO and for test tool environment
+  storage = new MemoryStorage();
+}
 
 // Conversation references cache
 const conversationReferences = {};

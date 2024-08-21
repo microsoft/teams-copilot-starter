@@ -1,0 +1,18 @@
+{
+	"entities": [
+		{
+		"name": "Tesla",
+		"ticker": "TSLA",
+		"website": "www.tesla.com",
+		"location": "North America",
+		"logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Tesla_Motors.svg/2000px-Tesla_Motors.svg.png"
+		},
+		{
+			"name": "Ford",
+			"ticker": "FORD",
+			"website": "www.ford.com",
+			"location": "North America",
+			"logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Ford_Motor_Company_Logo.svg/2000px-Ford_Motor_Company_Logo.svg.png"
+		}
+	]
+}
