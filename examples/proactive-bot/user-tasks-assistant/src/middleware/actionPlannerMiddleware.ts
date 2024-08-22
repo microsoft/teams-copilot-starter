@@ -5,7 +5,7 @@ import {
   PredictedSayCommand,
 } from "@microsoft/teams-ai";
 import { TeamsAI } from "../bot/teamsAI";
-import { TurnContext } from "botbuilder";
+import { ActivityTypes, TurnContext } from "botbuilder";
 import {
   ApplicationTurnState,
   ChatCompletionActionExt,
@@ -15,6 +15,7 @@ import { Utils } from "../helpers/utils";
 import { Logger } from "../telemetry/logger";
 import { getSemanticInfo } from "../actions/actionNames";
 import { Env } from "../env";
+import { AIEntity } from "@microsoft/teams-ai/lib/actions";
 
 export class ActionPlannerMiddleware {
   // Reference to the TeamsAI instance
@@ -241,6 +242,77 @@ export class ActionPlannerMiddleware {
   }
 
   /**
+   * Middleware handler of the "SayCommand" action
+   * @param context
+   * @param state
+   * @param data
+   * @returns
+   */
+  private async actionSayCommand(
+    context: TurnContext,
+    state: ApplicationTurnState,
+    data: PredictedSayCommand,
+    action?: string
+  ): Promise<string> {
+    if (!data.response?.content) {
+      return "";
+    }
+
+    // Let the user know what the bot is working
+    await Utils.startTypingTimer(context, state);
+
+    // Replace markdown code blocks with <pre> tags
+    let addTag = false;
+    let inCodeBlock = false;
+    const output: string[] = [];
+    const response = data.response.content!.split("\n");
+    for (const line of response) {
+      if (line.startsWith("```")) {
+        if (!inCodeBlock) {
+          // Add tag to start of next line
+          addTag = true;
+          inCodeBlock = true;
+        } else {
+          // Add tag to end of previous line
+          output[output.length - 1] += "</pre>";
+          addTag = false;
+          inCodeBlock = false;
+        }
+      } else if (addTag) {
+        output.push(`<pre>${line}`);
+        addTag = false;
+      } else {
+        output.push(line);
+      }
+    }
+
+    // Send response
+    const formattedResponse = output.join("\n");
+    const feedbackLoopEnabled = true;
+    const referencedCitations = data.response.context;
+
+    await context.sendActivity({
+      type: ActivityTypes.Message,
+      text: formattedResponse,
+      ...{ channelData: { feedbackLoopEnabled } },
+      entities: [
+        {
+          type: "https://schema.org/Message",
+          "@type": "Message",
+          "@context": "https://schema.org",
+          "@id": "",
+          additionalType: ["AIGeneratedContent"],
+          ...{},
+        },
+      ] as AIEntity[],
+    });
+
+    return (await this.isLastAction(context, state, action ?? ""))
+      ? AI.StopCommandName
+      : action ?? "";
+  }
+
+  /**
    * Attach the middleware to the bot
    * @param action
    * @returns
@@ -272,6 +344,21 @@ export class ActionPlannerMiddleware {
             action?: string
           ) => {
             return await this.actionDoCommand(context, state, cmd, action);
+          }
+        );
+        break;
+
+      case AI.SayCommandActionName:
+        // Replace the default action planner handler with the middleware handler
+        this.teamsAI.app.ai.action(
+          AI.SayCommandActionName,
+          async (
+            context: TurnContext,
+            state: ApplicationTurnState,
+            data: PredictedSayCommand,
+            action?: string
+          ) => {
+            return await this.actionSayCommand(context, state, data, action);
           }
         );
         break;

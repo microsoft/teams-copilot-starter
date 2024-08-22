@@ -111,15 +111,11 @@ export async function webRetrieval(
     logger.error(
       `Failed adding content to the index: ${(error as Error).message}`
     );
-    if (error instanceof Errors.FileTooLargeError || Errors.TooManyPagesError) {
-      await context.sendActivity(`I'm sorry, I could not add the file to the index. 
-        It is too large. Document should not have more than ${env.data.MAX_PAGES} page(s) 
-        and ${env.data.MAX_FILE_SIZE} characters of text.`);
-    } else {
-      await context.sendActivity(
-        "I'm sorry, I could not add the content to the index."
-      );
-    }
+    await context.sendActivity(
+      `I'm sorry, I could not add the content to the index: ${
+        (error as Error).message
+      }`
+    );
     return AI.StopCommandName;
   }
 

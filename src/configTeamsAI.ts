@@ -110,6 +110,9 @@ export function configureTeamsAI(
   // Attach the middleware to the Teams AI bot's Do command action
   actionPlannerMiddleware.attachMiddleware(AI.DoCommandActionName);
 
+  // Attach the middleware to the Teams AI bot's Say command action
+  actionPlannerMiddleware.attachMiddleware(AI.SayCommandActionName);
+
   logger.info("Teams AI configured");
 
   return bot;
