@@ -1,0 +1,35 @@
+# TeamsFx files
+env/.env.*.user
+env/.env.local
+env/.env.deploytest
+.localConfigs
+appPackage/build
+
+# dependencies
+node_modules/
+
+# misc
+.env
+.deployment
+.DS_Store
+
+# build
+lib/
+build/
+
+#npm package files
+package-lock.json
+yarn.lock
+
+# Vectra files
+index/
+
+# Teams Test Toolkit
+.localConfigs.testTool
+.teamsapptesttool.yml
+env/.env.testTool
+devTools/*
+.env.test
+
+# .nx cache
+.nx/

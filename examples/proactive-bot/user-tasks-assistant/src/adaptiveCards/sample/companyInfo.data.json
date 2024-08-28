@@ -1,0 +1,97 @@
+{
+	"entity": {
+		"companyInfo": {
+			"id": "000507951",
+			"name": "MICROSOFT CORPORATION",
+			"ticker": "MSFT",
+			"address": {
+				"addressLine": "1, MICROSOFT WAY",
+				"city": "REDMOND",
+				"country": "United States of America",
+				"city_state": "REDMOND, United States of America"
+			},
+			"website": "www.microsoft.com"
+		},
+		"watchListStatus": "clear",
+		"lastUpdated": "2023-05-30T17:56:24.312Z",
+		"esg": {
+			"score": 46,
+			"rating": "Limited performance",
+			"date": "7/3/2022",
+			"factors": {
+				"e": 61,
+				"s": 38,
+				"g": 55
+			}
+		},
+		"prompts": [
+			"What is the latest rating for MICROSOFT CORPORATION?",
+			"What is MICROSOFT CORPORATION's credit outlook and what it could do to improve it?",
+			"What is the last 2021 revenue for MICROSOFT CORPORATION?",
+			"Give me a table with the last known ratings for MICROSOFT CORPORATION"
+		]
+	},
+	"companies": [
+		{
+			"id": "005222131",
+			"name": "MICROSOFT IRELAND OPERATIONS LIMITED",
+			"ticker": "",
+			"address": {
+				"country": "Ireland",
+				"city": "DUBLIN 2",
+				"addressLine": "70 SIR JOHN ROGERSON'S QUAY, DUBLIN 2, DUBLIN",
+				"city_state": "DUBLIN 2, Ireland"
+			},
+			"website": "www.microsoft.com"
+		},
+		{
+			"id": "005222131",
+			"name": "MICROSOFT IRELAND OPERATIONS LIMITED",
+			"ticker": "",
+			"address": {
+				"country": "Ireland",
+				"city": "DUBLIN 2",
+				"addressLine": "70 SIR JOHN ROGERSON'S QUAY, DUBLIN 2, DUBLIN",
+				"city_state": "DUBLIN 2, Ireland"
+			},
+			"website": "www.microsoft.com"
+		},
+		{
+			"id": "009748336",
+			"name": "MICROSOFT ROUND ISLAND ONE UNLIMITED COMPANY",
+			"ticker": "",
+			"address": {
+				"country": "Ireland",
+				"city": "DUBLIN 2",
+				"addressLine": "70 SIR JOHN ROGERSON'S QUAY, DUBLIN 2, DUBLIN",
+				"city_state": "DUBLIN 2, Ireland"
+			},
+			"website": "www.microsoft.com"
+		},
+		{
+			"id": "053385840",
+			"name": "MICROSOFT JAPAN CO.,LTD.",
+			"ticker": "",
+			"address": {
+				"country": "Japan",
+				"city": "MINATO-KU",
+				"addressLine": "16-3, KONAN 2-CHOME",
+				"city_state": "MINATO-KU, Japan"
+			},
+			"website": "www.microsoft.com"
+		},
+		{
+			"id": "004109812",
+			"name": "MICROSOFT LIMITED",
+			"ticker": "",
+			"address": {
+				"country": "United Kingdom",
+				"city": "READING",
+				"addressLine": "MICROSOFT CAMPUS, THAMES VALLEY PARK",
+				"city_state": "READING, United Kingdom"
+			},
+			"website": "www.microsoft.com"
+		}
+	],
+	"showMore": true
+}

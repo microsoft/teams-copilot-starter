@@ -1,0 +1,51 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.4",
+  "msteams": {
+    "width": "Full"
+  },
+  "body": [
+    {
+      "type": "Container",
+      "size": "stretch",
+      "separator": true,
+      "wrap": true,
+      "$data": "${history}",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "style": "default",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${role}",
+                  "weight": "Bolder"
+                }
+              ],
+              "width": "auto"
+            },
+            {
+              "type": "Column",
+              "style": "emphasis",
+              "spacing": "large",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${content}",
+                  "fontType": "Monospace",
+                  "horizontalAlignment": "left",
+                  "wrap": true
+                }
+              ],
+              "width": "stretch"
+            }
+          ],
+          "spacing": "small"
+        }
+      ]
+    }
+  ]
+}

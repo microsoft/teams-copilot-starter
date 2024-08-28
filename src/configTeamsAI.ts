@@ -5,17 +5,16 @@ import {
   OpenAIModel,
   PromptCompletionModel,
   PromptManager,
-  TeamsAdapter,
 } from "@microsoft/teams-ai";
 import path from "path";
 import { TeamsAI } from "./bot/teamsAI";
 import { TurnContext, Storage } from "botbuilder";
 import { Logger } from "./telemetry/logger";
 import { CustomOpenAIModel } from "./ai/customOpenAIModel";
-import * as responses from "./resources/responses";
 import { Env, OpenAIType } from "./env";
 import { ActionPlannerMiddleware } from "./middleware/actionPlannerMiddleware";
 import { Utils } from "./helpers/utils";
+import * as responses from "./resources/responses";
 
 /**
  * Configure the Teams AI components
@@ -25,17 +24,13 @@ import { Utils } from "./helpers/utils";
  */
 export function configureTeamsAI(
   storage: Storage,
-  adapter: TeamsAdapter,
   logger: Logger,
-  env: Env
+  env: Env,
+  conversationReferences?: any
 ): TeamsAI {
   logger.info("Configuring Teams AI");
   // Retrieve all configuration settings asynchronously
   logger.info("Retrieving configuration settings for Teams AI");
-  if (!env.data.BOT_ID) {
-    throw new Error("Missing BOT_ID in environment variables");
-  }
-  const botAppId = env.data.BOT_ID;
 
   let model: PromptCompletionModel;
 
@@ -90,7 +85,7 @@ export function configureTeamsAI(
       planner: ActionPlanner<ApplicationTurnState>
     ) => {
       // Send the waiting message before the plan is ready
-      await context.sendActivity(responses.waitingForResponse());
+      // await context.sendActivity(responses.waitingForResponse());
 
       // Show typing indicator
       await Utils.startTypingTimer(context, state);
@@ -104,16 +99,19 @@ export function configureTeamsAI(
   });
 
   // Create the bot that will handle incoming messages.
-  const bot = new TeamsAI(botAppId, adapter, storage, planner);
+  const bot = new TeamsAI(storage, planner, conversationReferences);
 
   // Create the Teams AI Action Planner Middleware
-  const actionPlannerMiddleware = new ActionPlannerMiddleware(bot, logger);
+  const actionPlannerMiddleware = new ActionPlannerMiddleware(bot, logger, env);
 
   // Attach the middleware to the Teams AI bot's Plan ready action
   actionPlannerMiddleware.attachMiddleware(AI.PlanReadyActionName);
 
   // Attach the middleware to the Teams AI bot's Do command action
   actionPlannerMiddleware.attachMiddleware(AI.DoCommandActionName);
+
+  // Attach the middleware to the Teams AI bot's Say command action
+  actionPlannerMiddleware.attachMiddleware(AI.SayCommandActionName);
 
   logger.info("Teams AI configured");
 

@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "declarationMap": true,
+    "strict": true,
+    "declaration": true,
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNEXT",
+    "module": "CommonJS",
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./lib/.tsbuildinfo",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node", // to support injectable
+    "experimentalDecorators": true, // to support injectable
+    "emitDecoratorMetadata": true, // to support injectable
+    "types": ["jest", "reflect-metadata"],
+  },
+  "include": ["./src/**/*", "./src/adaptiveCards/templates/*.json", "./src/resources/*.json"],
+  "exclude": ["node_modules", "**/*.spec.ts", "lib"]
+}

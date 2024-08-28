@@ -1,0 +1,66 @@
+{
+    "root": true,
+    "ignorePatterns": ["node_modules/*"],
+    "plugins": ["@typescript-eslint", "mocha", "only-warn", "prettier", "@nrwl/nx"],
+    "parser": "@typescript-eslint/parser",
+    "env": {
+        "browser": true,
+        "node": true,
+        "es2015": true,
+        "mocha": true,
+        "jest": true
+    },
+    "overrides": [
+        {
+            "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+            "rules": {
+                // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
+                "@typescript-eslint/ban-types": "off",
+                "@typescript-eslint/explicit-function-return-type": "off",
+                "@typescript-eslint/explicit-member-accessibility": "off",
+                "@typescript-eslint/explicit-module-boundary-types": "off",
+                "@typescript-eslint/interface-name-prefix": "off",
+                "@typescript-eslint/no-empty-function": "off",
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/no-namespace": "off",
+                "@typescript-eslint/no-non-null-assertion": "off",
+                "@typescript-eslint/no-unused-vars": "off",
+                "security/detect-object-injection": "off",
+                "import/named": "off",
+                "no-async-promise-executor": "off",
+                "no-constant-condition": "off",
+                "quotes": ["error", "double"],
+                "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
+                "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
+                "prettier/prettier": "error"
+            }            
+        },
+        {
+            "files": ["*.js", "*.jsx"],
+            "extends": ["plugin:@nrwl/nx/javascript"],
+            "rules": {}
+        },
+        {
+            "files": ["*.test.ts", "*.test.js", "*.spec.ts", "*.spec.tsx", "*.spec.js", "*.spec.jsx"],
+            "env": {
+                "jest": true
+            },
+            "rules": {}
+        }
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/typescript",
+        "plugin:import/recommended",
+        "plugin:security/recommended",
+        "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2015,
+        "sourceType": "module",
+        "ecmaFeatures": {
+             "jsx": false
+        }
+    }
+}

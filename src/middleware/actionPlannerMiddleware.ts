@@ -1,4 +1,9 @@
-import { AI, Plan, PredictedDoCommand } from "@microsoft/teams-ai";
+import {
+  AI,
+  Plan,
+  PredictedDoCommand,
+  PredictedSayCommand,
+} from "@microsoft/teams-ai";
 import { TeamsAI } from "../bot/teamsAI";
 import { TurnContext } from "botbuilder";
 import {
@@ -9,15 +14,18 @@ import {
 import { Utils } from "../helpers/utils";
 import { Logger } from "../telemetry/logger";
 import { getSemanticInfo } from "../actions/actionNames";
+import { Env } from "../env";
 
 export class ActionPlannerMiddleware {
   // Reference to the TeamsAI instance
-  private teamsAI: TeamsAI;
-  private logger: Logger;
+  private readonly teamsAI: TeamsAI;
+  private readonly logger: Logger;
+  private readonly env: Env;
 
-  constructor(teamsAI: TeamsAI, logger: Logger) {
+  constructor(teamsAI: TeamsAI, logger: Logger, env: Env) {
     this.teamsAI = teamsAI;
     this.logger = logger;
+    this.env = env;
   }
 
   /**
@@ -41,27 +49,37 @@ export class ActionPlannerMiddleware {
       );
 
       // Validate that the action plan contains at least one "DO" command
-      if (
-        !plan.commands.some(
-          (c) => c.type === "DO" && (c as PredictedDoCommand).action
-        )
-      ) {
-        this.logger.warn(
-          // eslint-disable-next-line quotes
-          `The action plan does not contain any "DO" command. Will fallback to the default ChatGPT action plan`
-        );
+      if (this.env.data.ROUTE_UKNOWN_ACTION_TO_SEMANTIC) {
+        if (
+          !plan.commands.some(
+            (c) => c.type === "DO" && (c as PredictedDoCommand).action
+          )
+        ) {
+          this.logger.warn(
+            // eslint-disable-next-line quotes
+            `The action plan does not contain any "DO" command. Will fallback to the default ChatGPT action plan`
+          );
 
-        // Replace the SAY command with the default ChatGPT action plan
-        plan.commands = plan.commands.filter(
-          (c) => c.type !== "SAY"
-        ) as PredictedDoCommand[];
-        plan.commands.push({
-          type: "DO",
-          action: getSemanticInfo,
-          parameters: {
-            entity: state.temp.input,
-          },
-        } as PredictedDoCommand);
+          // Send the user quick response and continue with the default ChatGPT action plan
+          const sayCommand = plan.commands.find(
+            (c) => c.type === "SAY"
+          ) as PredictedSayCommand;
+          if (sayCommand && sayCommand.response?.content) {
+            await context.sendActivity(sayCommand.response.content);
+          }
+
+          // Replace the SAY command with the default ChatGPT action plan
+          plan.commands = plan.commands.filter(
+            (c) => c.type !== "SAY"
+          ) as PredictedDoCommand[];
+          plan.commands.push({
+            type: "DO",
+            action: getSemanticInfo,
+            parameters: {
+              entity: state.temp.input,
+            },
+          } as PredictedDoCommand);
+        }
       }
 
       // Swap places of the "DO" and "SAY" commands
