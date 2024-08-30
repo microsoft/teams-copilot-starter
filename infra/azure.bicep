@@ -4,7 +4,7 @@
 param botResourceBaseName string
 
 @description('Required when create Azure Bot service')
-param botAadAppClientId string
+param botId string
 
 param location string = resourceGroup().location
 
@@ -25,15 +25,14 @@ param teamsAppId string
 
 param botServerfarmsName string = '${botResourceBaseName}plan'
 param botWebAppName string = '${botResourceBaseName}web'
-param botChatHistoryStorageName string = '${botResourceBaseName}sta'
-param storageAccountName string
+param existingStorageAccountName string
 
 @allowed([
   'new'
   'existing'
 ])
-param newOrExistingStorageAcct string = (storageAccountName == '') ? 'new' : 'existing'
-
+param newOrExistingStorageAcct string
+var storageAccountName = (newOrExistingStorageAcct == 'new') ? '${botResourceBaseName}sta' : existingStorageAccountName
 
 param aadAppClientId string
 param aadAppTenantId string
@@ -91,7 +90,7 @@ resource botAppInsights 'Microsoft.Insights/components@2020-02-02' = {
 resource botNewStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = if (newOrExistingStorageAcct == 'new') {
   kind: 'StorageV2'
   location: location
-  name: botChatHistoryStorageName
+  name: storageAccountName
   properties: {
     supportsHttpsTrafficOnly: true
   }
@@ -140,7 +139,7 @@ resource botWebApp 'Microsoft.Web/sites@2021-02-01' = {
         }
         {
           name: 'BOT_ID'
-          value: botAadAppClientId
+          value: botId
         }
         {
           name: 'BOT_PASSWORD'
@@ -162,7 +161,7 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
     TEAMSFX_ENV: teamsFxEnv
     APP_VERSION: appVersion
     TEAMS_APP_ID: teamsAppId
-    BOT_ID: botAadAppClientId
+    BOT_ID: botId
     BOT_PASSWORD: botAadAppClientSecret
     BOT_DOMAIN: botWebApp.properties.defaultHostName
     BOT_APP_TYPE: botAppType
@@ -201,7 +200,7 @@ module azureBotRegistration './botRegistration/azurebot.bicep' = {
   name: 'Azure-Bot-registration'
   params: {
     resourceBaseName: botResourceBaseName
-    botAadAppClientId: botAadAppClientId
+    botId: botId
     botAppDomain: botWebApp.properties.defaultHostName
     botDisplayName: botDisplayName
   }

@@ -96,32 +96,32 @@ provision:
 
 # Triggered when 'teamsfx deploy' is executed
 deploy:
-  # Run npm command
-  - uses: cli/runNpmCommand
+  # Run yarn command
+  - uses: cli/runNpxCommand
     name: install dependencies
     with:
-      args: install
+      args: yarn
 
-  # Run npm lint on all projects
-  - uses: cli/runNpmCommand
+  # Run yarn run lint on all projects
+  - uses: cli/runNpxCommand
     name: lint app
     with:
-      args: run lint
+      args: yarn run lint
 
-  # Run npm build for all the remaining projects
-  - uses: cli/runNpmCommand
+  # Run yarn run build for all the remaining projects
+  - uses: cli/runNpxCommand
     name: build app
     env:
       TEAMS_APP_ID: ${{TEAMS_APP_ID}}
     with:
-      args: run build --if-present
-  
+      args: yarn run build
+
   # Deploy your application to Azure App Service using the zip deploy feature.
   # For additional details, refer to https://aka.ms/zip-deploy-to-app-services.
   - uses: azureAppService/zipDeploy
     with:
       workingDirectory: .
-      # Deploy base folder
+      # Path to the distribution folder that contains the files to deploy
       artifactFolder: .
       # Ignore file location, leave blank will ignore nothing
       ignoreFile: .webappignore
@@ -130,6 +130,7 @@ deploy:
       # You can replace it with your existing Azure Resource id
       # or add it to your environment variable file.
       resourceId: ${{BOT_AZURE_APP_SERVICE_RESOURCE_ID}}
+      dryRun: false
 
 # Triggered when 'teamsfx publish' is executed
 publish:

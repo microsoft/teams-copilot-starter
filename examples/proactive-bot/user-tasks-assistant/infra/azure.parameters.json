@@ -17,7 +17,7 @@
     "storageSKU": {
       "value": "Standard_LRS"
     },
-    "botAadAppClientId": {
+    "botId": {
       "value": "${{BOT_ID}}"
     },
     "botAppType": {
