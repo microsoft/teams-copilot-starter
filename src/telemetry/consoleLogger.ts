@@ -36,20 +36,18 @@ export class ConsoleLogger implements ILogger {
   }
 
   public trackEvent(eventEntry: EventEntry): void {
-    const msg = `Event Entry %c${eventEntry.name} [%c${
+    const msg = `Event Entry ${eventEntry.name} [${
       eventEntry.module
-    }]: [appVersion: ${this.env.data.APP_VERSION}] %c${JSON.stringify(
+    }]: [appVersion: ${this.env.data.APP_VERSION}] ${JSON.stringify(
       eventEntry.properties
     )}`;
     console.log(msg);
   }
 
   public trackDurationMetric(metricEntry: MetricEntry): void {
-    const msg = `Metric Entry %c${metricEntry.name} [%c${
-      metricEntry.name
-    }]: [appVersion: ${this.env.data.APP_VERSION}] %c${JSON.stringify(
-      metricEntry
-    )}`;
+    const msg = `Metric Entry [${metricEntry.name}]: [appVersion: ${
+      this.env.data.APP_VERSION
+    }] ${JSON.stringify(metricEntry)}`;
     console.log(msg);
   }
 }

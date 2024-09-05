@@ -6,6 +6,7 @@ import {
   CardAction,
   ActivityTypes,
   TurnContext,
+  Activity,
 } from "botbuilder";
 import fetch from "node-fetch";
 import * as ACData from "adaptivecards-templating";
@@ -18,10 +19,25 @@ import { ApplicationTurnState } from "../models/aiTypes";
 import { container } from "tsyringe";
 import { Env } from "../env";
 import { TeamsAI } from "../bot/teamsAI";
+import { StringMap } from "../types";
 
 const TYPING_TIMER_DELAY = 1000;
 // Define a Utils class
 export class Utils {
+  /**
+   * Get the user properties from the activity.
+   * @param activity The activity to get the user properties from.
+   * @returns The user properties from the activity.
+   */
+  static GetUserProperties(activity: Activity): StringMap {
+    const userProperties: StringMap = {
+      userAadObjectId: activity.from.aadObjectId ?? "",
+      userName: activity.from.name ?? "",
+      tenantId: activity.conversation.tenantId ?? "",
+    };
+    return userProperties;
+  }
+
   static async MaxTurnsToRemember(): Promise<number> {
     const env = container.resolve(Env);
     return env.data.MAX_TURNS! * 2;
