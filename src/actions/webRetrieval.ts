@@ -20,6 +20,7 @@ import * as Errors from "../types/errors";
 import byodAnswerCard from "../adaptiveCards/templates/byodAnswer.json";
 import { ActionsHelper } from "../helpers/actionsHelper";
 import crypto from "crypto";
+import { EventNames } from "../types/eventNames";
 
 /**
  * Retrieves web content based on the provided URLs and user input.
@@ -36,6 +37,10 @@ export async function webRetrieval(
   planner: ActionPlanner<ApplicationTurnState>
 ): Promise<string> {
   const logger = logging.getLogger("bot.TeamsAI");
+  logger.trackEvent(
+    EventNames.Webretrieval,
+    Utils.GetUserProperties(context.activity)
+  );
   const env = container.resolve<Env>(Env);
 
   // Show typing indicator

@@ -14,6 +14,7 @@ import * as responses from "../resources/responses";
 import * as Errors from "../types/errors";
 import byodAnswerCard from "../adaptiveCards/templates/byodAnswer.json";
 import crypto from "crypto";
+import { EventNames } from "../types/eventNames";
 
 /**
  * Initiates a chat session with a document.
@@ -30,6 +31,10 @@ export async function chatWithDocument(
   planner: ActionPlanner<ApplicationTurnState>
 ): Promise<string> {
   const logger = logging.getLogger("bot.TeamsAI");
+  logger.trackEvent(
+    EventNames.ChatWithDocument,
+    Utils.GetUserProperties(context.activity)
+  );
   const env = container.resolve<Env>(Env);
 
   // Show typing indicator
