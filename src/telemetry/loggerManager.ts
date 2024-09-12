@@ -151,7 +151,7 @@ export class LogManager extends EventEmitter {
     });
 
     this.onMetricEntry((metricEntry: MetricEntry) => {
-      logger.trackDurationMetric(metricEntry);
+      logger.trackMetric(metricEntry);
     });
 
     this.addLoggerSink(logger);

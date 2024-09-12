@@ -63,7 +63,7 @@ export class BYODSkill extends BaseAISkill {
         this.state,
         this.promptTemplate!
       );
-      logger.trackDurationMetric(startTime, MetricNames.BYODSkillPrompt);
+      logger.trackDurationMetric(startTime, MetricNames.BYODSkillPromptTime);
 
       if (response.status !== "success") {
         if (response.error?.name === "AxiosError") {
