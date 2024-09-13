@@ -10,9 +10,13 @@ import { BlobsStorage } from "botbuilder-azure-blobs";
 import { Logger } from "./telemetry/logger";
 import adapter from "./adapter";
 import { MemoryStorage } from "botbuilder";
+import { trace } from "@opentelemetry/api";
 
 // Create an instance of the environment variables
 const envVariables: Env = container.resolve(Env);
+
+// Get OpenTelemetry Tracer
+const tracer = trace.getTracer("TCS-OpenTelemetry", "0.1.0");
 
 // Get logging
 const logger = container.resolve(Logger);

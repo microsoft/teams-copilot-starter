@@ -69,7 +69,9 @@ import { UserHelper } from "../helpers/userHelper";
 import * as commandNames from "../messageExtensions/commandNames";
 import { searchCmd } from "../messageExtensions";
 import { BlobsStorage } from "botbuilder-azure-blobs";
+import { Span, trace } from "@opentelemetry/api";
 
+const tracer = trace.getTracer("TeamsAI");
 
 
 
@@ -650,11 +652,16 @@ export class TeamsAI {
    * @returns
    */
   public async start(context: TurnContext): Promise<void> {
-    // Create the local Vectra index, if it does not exist
-    const index = new LocalDocumentIndex({ folderPath: this.env.data.VECTRA_INDEX_PATH! });
-    if (!await index.isIndexCreated()) {
-      await index.createIndex({ version: 1, deleteIfExists: true });
-    }
+    return tracer.startActiveSpan("Start TeamsAI", async (span: Span) => {
+      // Create the local Vectra index, if it does not exist
+      const index = new LocalDocumentIndex({ folderPath: this.env.data.VECTRA_INDEX_PATH! });
+      if (!await index.isIndexCreated()) {
+        await index.createIndex({ version: 1, deleteIfExists: true });
+      }
+      // Be sure to end the span!
+      span.end();
+    });
+
   }
 
   /**
