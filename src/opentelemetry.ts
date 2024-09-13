@@ -14,7 +14,7 @@ const resource = Resource.default().merge(
   new Resource({
     [ATTR_SERVICE_NAME]: "TCS",
     [ATTR_SERVICE_VERSION]: "0.1.0",
-  }),
+  })
 );
 
 console.log("Create OpenTelemetry WebTracerProvider");
