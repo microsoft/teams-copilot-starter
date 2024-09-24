@@ -63,9 +63,9 @@ export class AppInsightLogger implements ILogger {
     }
   }
 
-  public trackDurationMetric(metricEntry: MetricEntry): void {
+  public trackMetric(metricEntry: MetricEntry): void {
     if (this.appInsightClient) {
-      this.appInsightClient.trackDurationMetric(metricEntry);
+      this.appInsightClient.trackMetric(metricEntry);
     }
   }
 }

@@ -44,7 +44,7 @@ export class ConsoleLogger implements ILogger {
     console.log(msg);
   }
 
-  public trackDurationMetric(metricEntry: MetricEntry): void {
+  public trackMetric(metricEntry: MetricEntry): void {
     const msg = `Metric Entry %c${metricEntry.name} [%c${
       metricEntry.name
     }]: [appVersion: ${this.env.data.APP_VERSION}] %c${JSON.stringify(

@@ -7,4 +7,5 @@ export enum EventNames {
   DebugOff = "DebugOff",
   ForgetDocuments = "ForgetDocuments",
   ResetIndex = "ResetIndex",
+  FeedbackReceived = "FeedbackReceived",
 }

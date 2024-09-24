@@ -137,7 +137,7 @@ export abstract class BaseAISkill implements ISkill {
               );
               logger.trackDurationMetric(
                 indexStartTime,
-                MetricNames.VectraIndexingDuration
+                MetricNames.VectraIndexingTime
               );
               // Add the document to the conversation's documentIds
               this.state.conversation.documentIds.push(localDoc.id);

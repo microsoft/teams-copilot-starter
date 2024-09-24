@@ -1,5 +1,7 @@
 export enum MetricNames {
-  ChatGPTSkillPrompt = "ChatGPTSkillPrompt",
-  BYODSkillPrompt = "BYODSkillPrompt",
-  VectraIndexingDuration = "VectraIndexingDuration",
+  ChatGPTSkillPromptTime = "ChatGPTSkillPromptTime",
+  BYODSkillPromptTime = "BYODSkillPromptTime",
+  VectraIndexingTime = "VectraIndexingTime",
+  LikeFeedbackCount = "LikeFeedbackCount",
+  DislikeFeedbackCount = "DislikeFeedbackCount",
 }

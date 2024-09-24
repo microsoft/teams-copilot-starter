@@ -130,6 +130,30 @@ export class Logger {
     }
   }
 
+  /**
+   * Track a metric for the duration of a process.
+   * @param {string} name - The name of the metric.
+   * @param {number} value - The value of the metric.
+   * @returns {void}
+   */
+  public trackMetric(name: string, value: number): void {
+    const metricEntry: MetricEntry = {
+      name: name,
+      value: value,
+    };
+
+    if (this.logManager) {
+      this.logManager.emit(LogMethods.TrackMetric, metricEntry);
+    }
+  }
+
+  /**
+   * Track a metric for the duration of a process.
+   *
+   * @param {number} startTime - The time the process started.
+   * @param {string} name - The name of the metric.
+   * @returns {void}
+   */
   public trackDurationMetric(startTime: number, name: string): void {
     // Calculate response time
     const endTime = Date.now();
@@ -137,7 +161,7 @@ export class Logger {
     // Track response time as a custom metric
     const metricEntry: MetricEntry = {
       name: name,
-      responseTime: responseTime,
+      value: responseTime,
     };
 
     if (this.logManager) {

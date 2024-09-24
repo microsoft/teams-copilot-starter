@@ -33,11 +33,11 @@ export class AppInsightsService {
     this.client.trackEvent({ name: eventName, properties });
   }
 
-  public trackDurationMetric(metricEntry: MetricEntry): void {
+  public trackMetric(metricEntry: MetricEntry): void {
     // Track response time as a custom metric
     const metricTelemetry: MetricTelemetry = {
       name: metricEntry.name,
-      value: metricEntry.responseTime,
+      value: metricEntry.value,
     };
     this.client.trackMetric(metricTelemetry);
   }

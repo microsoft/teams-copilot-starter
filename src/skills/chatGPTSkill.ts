@@ -110,7 +110,7 @@ export class ChatGPTSkill extends BaseAISkill {
         this.state,
         this.promptTemplate!
       );
-      logger.trackDurationMetric(startTime, MetricNames.ChatGPTSkillPrompt);
+      logger.trackDurationMetric(startTime, MetricNames.ChatGPTSkillPromptTime);
 
       if (response.status !== "success") {
         if (response.error?.name === "AxiosError") {
