@@ -55,7 +55,7 @@ export function configureTeamsAI(
         retryPolicy: [2000, 3000, 4000],
         // responseFormat: { type: "json_object" },
         useSystemMessages: true,
-        logRequests: true,
+        logRequests: false,
       });
       break;
     case OpenAIType.Enum.CustomAI:

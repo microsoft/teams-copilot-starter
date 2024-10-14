@@ -8,5 +8,5 @@ export interface ILogger {
   warn(logEntry: LogEntry): void;
   error(logEntry: LogEntry): void;
   trackEvent(eventEntry: EventEntry): void;
-  trackDurationMetric(metricEntry: MetricEntry): void;
+  trackMetric(metricEntry: MetricEntry): void;
 }

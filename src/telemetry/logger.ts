@@ -24,6 +24,8 @@
 import EventEmitter from "events";
 import { LogEntry } from "./loggerManager";
 import { AxiosError } from "axios";
+import { MetricEntry } from "../types/logging";
+import { EventEntry, LogMethods, StringMap } from "../types";
 
 export class Logger {
   private logManager: EventEmitter;
@@ -112,6 +114,58 @@ export class Logger {
       this.log("error", `Stack Trace: ${error.stack}`);
     } else {
       this.log("error", message);
+    }
+  }
+
+  public trackEvent(eventName: string, properties: StringMap): void {
+    properties["module"] = this.module;
+    const eventEntry: EventEntry = {
+      name: eventName,
+      module: this.module,
+      properties: properties,
+    };
+
+    if (this.logManager) {
+      this.logManager.emit(LogMethods.TrackEvent, eventEntry);
+    }
+  }
+
+  /**
+   * Track a metric for the duration of a process.
+   * @param {string} name - The name of the metric.
+   * @param {number} value - The value of the metric.
+   * @returns {void}
+   */
+  public trackMetric(name: string, value: number): void {
+    const metricEntry: MetricEntry = {
+      name: name,
+      value: value,
+    };
+
+    if (this.logManager) {
+      this.logManager.emit(LogMethods.TrackMetric, metricEntry);
+    }
+  }
+
+  /**
+   * Track a metric for the duration of a process.
+   *
+   * @param {number} startTime - The time the process started.
+   * @param {string} name - The name of the metric.
+   * @returns {void}
+   */
+  public trackDurationMetric(startTime: number, name: string): void {
+    // Calculate response time
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+    // Track response time as a custom metric
+    const metricEntry: MetricEntry = {
+      name: name,
+      value: responseTime,
+    };
+
+    if (this.logManager) {
+      this.logManager.emit(LogMethods.TrackMetric, metricEntry);
     }
   }
 }

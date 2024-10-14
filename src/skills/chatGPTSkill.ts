@@ -13,6 +13,8 @@ import { AxiosError } from "axios";
 import { logging } from "../telemetry/loggerManager";
 import { Utils } from "../helpers/utils";
 import { ActionsHelper } from "../helpers/actionsHelper";
+import { MetricNames } from "../types/metricNames";
+import { EventNames } from "../types/eventNames";
 
 // Get an instance of the Logger singleton object
 const logger = logging.getLogger("bot.TeamsAI");
@@ -56,6 +58,10 @@ export class ChatGPTSkill extends BaseAISkill {
   public override async run(input: string): Promise<any> {
     logger.debug("Running Chat GPT skill.");
     logger.debug(`Input: ${input}`);
+    logger.trackEvent(
+      EventNames.ChatGPTSkill,
+      Utils.GetUserProperties(this.context.activity)
+    );
 
     if (this.state.temp.useCache) {
       const maxTurnsToRemember = await Utils.MaxTurnsToRemember();
@@ -98,11 +104,13 @@ export class ChatGPTSkill extends BaseAISkill {
     }
 
     try {
+      const startTime = Date.now();
       const response = await this.planner.completePrompt(
         this.context,
         this.state,
         this.promptTemplate!
       );
+      logger.trackDurationMetric(startTime, MetricNames.ChatGPTSkillPromptTime);
 
       if (response.status !== "success") {
         if (response.error?.name === "AxiosError") {

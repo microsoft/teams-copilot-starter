@@ -8,6 +8,8 @@ import { usePolicy } from "cockatiel";
 import { AxiosError } from "axios";
 import { Utils } from "../helpers/utils";
 import { logging } from "../telemetry/loggerManager";
+import { EventNames } from "../types/eventNames";
+import { MetricNames } from "../types/metricNames";
 
 // Get an instance of the Logger singleton object
 const logger = logging.getLogger("bot.TeamsAI");
@@ -39,6 +41,8 @@ export class BYODSkill extends BaseAISkill {
   public override async run(input: string, hashFromUri?: string): Promise<any> {
     logger.debug("Running Bring Your Own Data skill.");
     logger.debug(`Input: ${input}`);
+    logger.trackEvent(EventNames.BYODSkill, Utils.GetUserProperties(this.context.activity));
+    
     this.state.temp.input = input;
 
     // Show typing indicator
@@ -53,11 +57,13 @@ export class BYODSkill extends BaseAISkill {
     }
     
     try {
+      const startTime = Date.now();
       const response = await this.planner.completePrompt(
         this.context,
         this.state,
         this.promptTemplate!
       );
+      logger.trackDurationMetric(startTime, MetricNames.BYODSkillPromptTime);
 
       if (response.status !== "success") {
         if (response.error?.name === "AxiosError") {

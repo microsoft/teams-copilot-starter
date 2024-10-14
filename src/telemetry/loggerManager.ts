@@ -23,7 +23,7 @@
 
 import { EventEmitter } from "events";
 import { Logger } from "./logger";
-import { ILogger } from "../types";
+import { EventEntry, ILogger, LogMethods, MetricEntry } from "../types";
 import { ConsoleLogger } from "./consoleLogger";
 
 /**
@@ -89,6 +89,28 @@ export class LogManager extends EventEmitter {
   }
 
   /**
+   * Registers a listener function to be called whenever a event entry is created.
+   * @param listener The function to be called when a event entry is created.
+   * @returns The LogManager instance.
+   */
+  public onEventEntry(listener: (eventEntry: EventEntry) => void): LogManager {
+    this.on(LogMethods.TrackEvent, listener);
+    return this;
+  }
+
+  /**
+   * Registers a listener function to be called whenever a event entry is created.
+   * @param listener The function to be called when a event entry is created.
+   * @returns The LogManager instance.
+   */
+  public onMetricEntry(
+    listener: (metricEntry: MetricEntry) => void
+  ): LogManager {
+    this.on(LogMethods.TrackMetric, listener);
+    return this;
+  }
+
+  /**
    * Registers a ConsoleLogger instance to log to the console.
    * @returns The LogManager instance.
    */
@@ -122,6 +144,14 @@ export class LogManager extends EventEmitter {
         default:
           logger.info(logEntry);
       }
+    });
+
+    this.onEventEntry((eventEntry: EventEntry) => {
+      logger.trackEvent(eventEntry);
+    });
+
+    this.onMetricEntry((metricEntry: MetricEntry) => {
+      logger.trackMetric(metricEntry);
     });
 
     this.addLoggerSink(logger);

@@ -69,6 +69,8 @@ import { UserHelper } from "../helpers/userHelper";
 import * as commandNames from "../messageExtensions/commandNames";
 import { searchCmd } from "../messageExtensions";
 import { BlobsStorage } from "botbuilder-azure-blobs";
+import { MetricNames } from "../types/metricNames";
+import { EventNames } from "../types/eventNames";
 
 
 
@@ -392,6 +394,17 @@ export class TeamsAI {
     this.app.feedbackLoop(async (context: TurnContext, state: ApplicationTurnState, feedback: FeedbackLoopData) => {
       // Log the feedback
       this.logger.info(`Feedback received: ${JSON.stringify(feedback)}`);
+      switch (feedback.actionValue.reaction) {
+        case "like":
+          this.logger.trackMetric(MetricNames.LikeFeedbackCount, 1);
+          break;
+        case "dislike":
+          this.logger.trackMetric(MetricNames.DislikeFeedbackCount, 1);
+          break;
+        default:
+          break;
+      }
+      this.logger.trackEvent(EventNames.FeedbackReceived, { reaction: feedback.actionValue.reaction, feedback: feedback.actionValue.feedback });
       await context.sendActivity("Thank you for your feedback.");
       if (state.conversation.debug) {
         await context.sendActivity(`Feedback received: ${JSON.stringify(feedback)}`);

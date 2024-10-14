@@ -6,6 +6,8 @@ import { Env } from "../env";
 import { VectraDataSource } from "../dataSources/vectraDataSource";
 import { UserHelper } from "../helpers/userHelper";
 import { ActionsHelper } from "../helpers/actionsHelper";
+import { EventNames } from "../types/eventNames";
+import { Utils } from "../helpers/utils";
 
 /**
  * Resets the local Vectra index.
@@ -19,6 +21,10 @@ export async function resetIndex(
   state: ApplicationTurnState
 ): Promise<string> {
   const logger = logging.getLogger("bot.TeamsAI");
+  logger.trackEvent(
+    EventNames.ResetIndex,
+    Utils.GetUserProperties(context.activity)
+  );
   const env = container.resolve<Env>(Env);
 
   // Get the user's information

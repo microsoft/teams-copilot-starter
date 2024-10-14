@@ -32,7 +32,7 @@ export interface EventEntry {
 // Represents a metric entry with additional metric data.
 export interface MetricEntry {
   name: string;
-  responseTime: number;
+  value: number;
 }
 
 /**
