@@ -57,10 +57,14 @@ const bot = configureTeamsAI(
 logger.info("Starting bot");
 
 // Create HTTP server.
-const server = restify.createServer();
+const server = restify.createServer({
+  name: envVariables.data.APP_NAME,
+  version: envVariables.data.APP_VERSION,
+});
 server.use(restify.plugins.bodyParser());
-server.listen(process.env.PORT || process.env.port || 3978, () => {
-  logger.info(`Bot Started, ${server.name} listening to ${server.url}`);
+const port = process.env.PORT || process.env.port || 3978;
+server.listen(port, () => {
+  logger.info(`Bot Started, ${server.name} listening on ${port}`);
 });
 
 // Listen for incoming requests.

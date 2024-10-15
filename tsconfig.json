@@ -22,5 +22,5 @@
     "types": ["jest", "reflect-metadata"],
   },
   "include": ["./src/**/*", "./src/adaptiveCards/templates/*.json", "./src/resources/*.json"],
-  "exclude": ["node_modules", "**/*.spec.ts", "lib"]
+  "exclude": ["node_modules", "**/*.spec.ts", "lib", "examples"]
 }
