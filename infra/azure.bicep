@@ -13,6 +13,7 @@ param location string = resourceGroup().location
 param botAadAppClientSecret string
 param botAppType string
 param teamsFxEnv string
+param appName string
 param appVersion string
 
 param storageSKU string
@@ -25,14 +26,7 @@ param teamsAppId string
 
 param botServerfarmsName string = '${botResourceBaseName}plan'
 param botWebAppName string = '${botResourceBaseName}web'
-param existingStorageAccountName string
-
-@allowed([
-  'new'
-  'existing'
-])
-param newOrExistingStorageAcct string
-var storageAccountName = (newOrExistingStorageAcct == 'new') ? '${botResourceBaseName}sta' : existingStorageAccountName
+param botChatHistoryStorageName string = '${botResourceBaseName}sta'
 
 param aadAppClientId string
 param aadAppTenantId string
@@ -87,10 +81,10 @@ resource botAppInsights 'Microsoft.Insights/components@2020-02-02' = {
 
 // Azure Storage that hosts Tab static web site and Bot chat history
 // Deploy Azure Storage resource only if the flag is set to true
-resource botNewStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = if (newOrExistingStorageAcct == 'new') {
+resource botStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   kind: 'StorageV2'
   location: location
-  name: storageAccountName
+  name: botChatHistoryStorageName
   properties: {
     supportsHttpsTrafficOnly: true
   }
@@ -99,9 +93,6 @@ resource botNewStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = i
   }
 }
 
-resource botStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = if (newOrExistingStorageAcct == 'existing') {
-  name: storageAccountName
-}
 
 // Compute resources for the Bot Web App
 resource botServerfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
@@ -159,6 +150,7 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
     WEBSITE_NODE_DEFAULT_VERSION: '~18'
     WEBSITE_RUN_FROM_PACKAGE: '1'
     TEAMSFX_ENV: teamsFxEnv
+    APP_NAME: appName
     APP_VERSION: appVersion
     TEAMS_APP_ID: teamsAppId
     BOT_ID: botId
@@ -173,8 +165,8 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
     OPENAI_ENDPOINT: openAIEndpoint
     OPENAI_MODEL: openAIModel
     OPENAI_EMBEDDING_MODEL: openAIEmbeddingModel
-    STORAGE_ACCOUNT_NAME: (newOrExistingStorageAcct == 'new') ? botNewStorageAccount.name : botStorageAccount.name
-    STORAGE_ACCOUNT_KEY: (newOrExistingStorageAcct == 'new') ? botNewStorageAccount.listKeys().keys[0].value : botStorageAccount.listKeys().keys[0].value
+    STORAGE_ACCOUNT_NAME: botStorageAccount.name
+    STORAGE_ACCOUNT_KEY: botStorageAccount.listKeys().keys[0].value
     STORAGE_SAS_TOKEN: storageSasToken
     OPENAI_API_VERSION: openAIApiVersion
     VECTRA_INDEX_PATH: indexFolderPath
@@ -207,13 +199,13 @@ module azureBotRegistration './botRegistration/azurebot.bicep' = {
 }
 
 // Create a blob service for the Bot chat history
-resource botBlobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = if (newOrExistingStorageAcct == 'new') {
+resource botBlobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' =  {
   name: 'default'
   parent: botStorageAccount
 }
 
 // Create a blob container to store Bot chat history
-resource botStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = if (newOrExistingStorageAcct == 'new') {
+resource botStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
   parent: botBlobService
   name: 'conversations'
   properties: {
@@ -224,5 +216,5 @@ resource botStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/con
 // The output will be persisted in .env.{envName}. Visit https://aka.ms/teamsfx-actions/arm-deploy for more details.
 output BOT_AZURE_APP_SERVICE_RESOURCE_ID string = botWebApp.id
 output BOT_DOMAIN string = botWebApp.properties.defaultHostName
-output STORAGE_ACCOUNT_NAME string = (newOrExistingStorageAcct == 'new') ? botNewStorageAccount.name : botStorageAccount.name
-output STORAGE_ACCOUNT_KEY string = (newOrExistingStorageAcct == 'new') ? botNewStorageAccount.listKeys().keys[0].value : botStorageAccount.listKeys().keys[0].value
+output STORAGE_ACCOUNT_NAME string = botStorageAccount.name
+// output STORAGE_ACCOUNT_KEY string = botStorageAccount.listKeys().keys[0].value

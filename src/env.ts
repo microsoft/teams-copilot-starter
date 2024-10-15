@@ -41,6 +41,7 @@ class Env {
   constructor() {
     try {
       switch (this.environment) {
+        case "dev":
         case "local":
           {
             const partialFields = this.schema.partial();
