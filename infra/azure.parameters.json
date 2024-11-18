@@ -11,13 +11,16 @@
     "botResourceBaseName": {
       "value": "bot${{RESOURCE_SUFFIX}}"
     },
-    "storageAccountName": {
+    "newOrExistingStorageAcct": {
+      "value": "${{NEW_OR_EXISTING_STORAGE_ACCT}}"
+    },
+    "existingStorageAccountName": {
       "value": "${{STORAGE_ACCOUNT_NAME}}"
     },
     "storageSKU": {
       "value": "Standard_LRS"
     },
-    "botAadAppClientId": {
+    "botId": {
       "value": "${{BOT_ID}}"
     },
     "botAppType": {
@@ -48,7 +51,7 @@
       "value": "${{AAD_APP_OAUTH_AUTHORITY_HOST}}"
     },
     "openAIKey": {
-      "value": "${{OPENAI_KEY}}"
+      "value": "${{SECRET_OPENAI_KEY}}"
     },
     "openAIEndpoint": {
       "value": "${{OPENAI_ENDPOINT}}"
@@ -87,13 +90,13 @@
       "value": "${{MAX_PAGES}}"
     },
     "storageSasToken": {
-      "value": "${{STORAGE_SAS_TOKEN}}"
+      "value": "${{SECRET_STORAGE_SAS_TOKEN}}"
     },
     "azureSearchEndpoint": {
       "value": "${{AZURE_SEARCH_ENDPOINT}}"
     },
     "azureSearchKey": {
-      "value": "${{AZURE_SEARCH_KEY}}"
+      "value": "${{SECRET_AZURE_SEARCH_KEY}}"
     },
     "azureSearchIndexName": {
       "value": "${{AZURE_SEARCH_INDEX_NAME}}"
